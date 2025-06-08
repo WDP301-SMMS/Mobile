@@ -22,10 +22,10 @@ export default function Index() {
   return (
     <View
       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      className="bg-primary"
+      className="bg-white"
     >
       <Image
-        source={require("@/assets/images/splash-icon.png")}
+        source={require("@/assets/images/splash-icon-blue.png")}
         style={{ width: 200, height: 200, resizeMode: "contain" }}
       />
     </View>

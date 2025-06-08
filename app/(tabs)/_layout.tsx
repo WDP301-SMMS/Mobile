@@ -59,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="child"
         options={{
-          title: "Con của bạn",
+          title: "Con của tôi",
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={28} name="accessibility" color={color} />
           ),

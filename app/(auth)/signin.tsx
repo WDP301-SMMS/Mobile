@@ -96,7 +96,7 @@ export default function SignInScreen() {
             )}
           </View>
 
-          <View className="w-full mb-6">
+          <View className="w-full mb-4">
             <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
               <Ionicons name="lock-closed-outline" size={20} color="#6b7280" />
               <TextInput
@@ -122,6 +122,16 @@ export default function SignInScreen() {
             )}
           </View>
 
+          <View className="w-full items-end mb-6">
+            <Link href="/(auth)/forgot-password" asChild>
+              <TouchableOpacity>
+                <Text className="text-primary font-medium text-sm">
+                  Quên mật khẩu?
+                </Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+
           <TouchableOpacity
             className="bg-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80"
             onPress={handleSubmit(onSubmit)}
@@ -133,7 +143,7 @@ export default function SignInScreen() {
 
           <TouchableOpacity className="bg-white border border-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80 flex-row justify-center items-center">
             <Image
-              source={{ uri: "https://www.google.com/favicon.ico" }}
+              source={require("@/assets/icons/google.png")}
               style={{ width: 20, height: 20, marginRight: 8 }}
             />
             <Text className="text-primary text-center font-semibold text-lg">

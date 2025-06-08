@@ -8,9 +8,13 @@ export default function StackLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Onboarding" }} />
-      <Stack.Screen name="signin" options={{ title: "Sign In" }} />
-      <Stack.Screen name="signup" options={{ title: "Sign Up" }} />
+      <Stack.Screen name="index" options={{ title: "Trang chờ" }} />
+      <Stack.Screen name="signin" options={{ title: "Đăng nhập" }} />
+      <Stack.Screen name="signup" options={{ title: "Đăng ký" }} />
+      <Stack.Screen
+        name="forgot-password"
+        options={{ title: "Quên mật khẩu" }}
+      />
     </Stack>
   );
 }
