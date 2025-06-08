@@ -1,10 +1,10 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
-
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -48,11 +48,26 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="form"
+        options={{
+          title: "Đơn & Kết quả",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={28} name="description" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="child"
+        options={{
+          title: "Con của bạn",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={28} name="accessibility" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="info"
         options={{
-          // headerShown: true,
-          // headerTitle: "Thông tin cá nhân",
-          // headerTitleAlign: "center",
           title: "Cá nhân",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.fill" color={color} />

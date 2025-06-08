@@ -5,7 +5,12 @@ export default function StackLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
+        headerTitleAlign: "center",
+        headerTintColor: "#fff",
+        headerStyle: {
+          backgroundColor: "#0288d1",
+        },
       }}
     >
       <Stack.Screen name="index" options={{ title: "Tin nhắn" }} />
