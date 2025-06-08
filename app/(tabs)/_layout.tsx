@@ -59,6 +59,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="child"
         options={{
+          headerStyle: {
+            backgroundColor: "#0288D1",
+          },
+          headerTintColor: "#fff",
+          headerShown: true,
+          headerTitle: "Con của tôi",
+          headerTitleAlign: "center",
           title: "Con của tôi",
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={28} name="accessibility" color={color} />
