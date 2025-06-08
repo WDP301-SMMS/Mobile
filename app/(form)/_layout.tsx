@@ -1,4 +1,3 @@
-// app/(child)/_layout.js
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -14,12 +13,7 @@ export default function StackLayout() {
         },
       }}
     >
-      <Stack.Screen
-        name="[id]"
-        options={{
-          title: "Học sinh",
-        }}
-      />
+      <Stack.Screen name="[id]" options={{ title: "Đơn & Kết quả" }} />
     </Stack>
   );
 }
