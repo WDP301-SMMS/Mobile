@@ -13,7 +13,7 @@ export default function StackLayout() {
         headerTitleAlign: "center",
         headerTintColor: "#fff",
         headerStyle: {
-          backgroundColor: "#0288d1",
+          backgroundColor: "#2260FF",
         },
       }}
     >

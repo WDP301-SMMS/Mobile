@@ -13,7 +13,7 @@ export default function EntryScreen() {
         <Image
           source={require("@/assets/images/splash-icon-blue.png")}
           resizeMode="contain"
-          className="w-32 h-32 mb-6"
+          className="w-44 h-44 mb-6"
         />
 
         <Image

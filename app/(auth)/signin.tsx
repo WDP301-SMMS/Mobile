@@ -64,7 +64,7 @@ export default function SignInScreen() {
         <View className="flex-1 justify-center items-center px-6 py-8">
           <Image
             source={require("@/assets/images/splash-icon-blue.png")}
-            className="w-40 h-40 mb-4"
+            className="w-64 h-64 mb-4"
             resizeMode="contain"
           />
 

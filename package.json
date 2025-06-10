@@ -1,5 +1,5 @@
 {
-  "name": "mobile",
+  "name": "educare",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@hookform/resolvers": "^5.1.0",
+    "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
@@ -42,8 +43,7 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "tailwindcss": "^3.4.17",
-    "zod": "^3.25.56",
-    "@react-native-picker/picker": "2.9.0"
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

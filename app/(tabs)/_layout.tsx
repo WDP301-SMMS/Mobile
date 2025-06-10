@@ -10,7 +10,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#0288D1",
+        tabBarActiveTintColor: "#2260FF",
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -60,7 +60,7 @@ export default function TabLayout() {
         name="child"
         options={{
           headerStyle: {
-            backgroundColor: "#0288D1",
+            backgroundColor: "#2260FF",
           },
           headerTintColor: "#fff",
           headerShown: true,
@@ -76,7 +76,7 @@ export default function TabLayout() {
         name="info"
         options={{
           headerStyle: {
-            backgroundColor: "#0288D1",
+            backgroundColor: "#2260FF",
           },
           headerTintColor: "#fff",
           headerShown: true,
