@@ -4,7 +4,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const currentUser = {
   fullName: "Võ Văn Phụ Huynh",
-  email: "phuhuynh.a@example.com",
+  phone: "0958491234",
   avatar: "https://i.pravatar.cc/150?img=15",
   role: "Phụ huynh",
 };
@@ -21,17 +21,15 @@ export default function InfoScreen() {
         <Text className="text-2xl font-bold text-primary mb-1">
           {currentUser.fullName}
         </Text>
-        <Text className="text-base text-gray-700">
-          {currentUser.role}
-        </Text>
-        <Text className="text-sm text-gray-500 mt-1">{currentUser.email}</Text>
+        <Text className="text-base text-gray-700">{currentUser.role}</Text>
+        <Text className="text-sm text-gray-500 mt-1">{currentUser.phone}</Text>
       </View>
 
       <View className="px-6 py-6">
         <Link href="/(profile)" asChild>
           <TouchableOpacity className="flex-row items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200 mb-3">
             <View className="flex-row items-center">
-              <MaterialIcons name="person-outline" size={24} color="#0288D1" />
+              <MaterialIcons name="person-outline" size={24} color="#2260FF" />
               <Text className="text-lg font-semibold text-primary ml-4">
                 Thông tin cá nhân
               </Text>
@@ -46,7 +44,7 @@ export default function InfoScreen() {
               <MaterialIcons
                 name="notifications-none"
                 size={24}
-                color="#0288D1"
+                color="#2260FF"
               />
               <Text className="text-lg font-semibold text-primary ml-4">
                 Thông báo
@@ -59,7 +57,11 @@ export default function InfoScreen() {
         <Link href="/(chat)" asChild>
           <TouchableOpacity className="flex-row items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200 mb-3">
             <View className="flex-row items-center">
-              <MaterialIcons name="messenger-outline" size={24} color="#0288D1" />
+              <MaterialIcons
+                name="messenger-outline"
+                size={24}
+                color="#2260FF"
+              />
               <Text className="text-lg font-semibold text-primary ml-4">
                 Tin nhắn
               </Text>

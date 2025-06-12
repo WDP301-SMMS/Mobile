@@ -50,7 +50,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="form"
         options={{
-          title: "Đơn & Kết quả",
+          headerStyle: {
+            backgroundColor: "#2260FF",
+          },
+          headerTintColor: "#fff",
+          headerShown: true,
+          headerTitle: "Đơn & Kết quả",
+          headerTitleAlign: "center",
+          title: "Đơn $ Kết quả",
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={28} name="description" color={color} />
           ),

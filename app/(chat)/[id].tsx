@@ -2,15 +2,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface Message {
@@ -200,7 +200,7 @@ export default function ChatDetailScreen() {
             <View
               className={`max-w-[70%] p-3 rounded-lg ${
                 message.senderId === currentUserId
-                  ? "bg-blue-500 rounded-br-none"
+                  ? "bg-primary rounded-br-none"
                   : "bg-gray-200 rounded-bl-none"
               }`}
             >
@@ -229,17 +229,18 @@ export default function ChatDetailScreen() {
 
       <View className="flex-row items-center p-4 border-t border-gray-200 bg-white">
         <TextInput
-          className="flex-1 p-3 border border-gray-300 rounded-full mr-3 text-base"
+          className="flex-1 p-3 border border-gray-300 rounded-2xl mr-3 text-base"
           placeholder="Nhập tin nhắn..."
           value={newMessage}
           onChangeText={setNewMessage}
+          numberOfLines={3}
           multiline
           returnKeyType="send"
           onSubmitEditing={handleSendMessage}
         />
         <TouchableOpacity
           onPress={handleSendMessage}
-          className="bg-primary p-3 rounded-full"
+          className="bg-primary p-3 rounded-full flex justify-center items-center"
         >
           <MaterialIcons name="send" size={24} color="#fff" />
         </TouchableOpacity>

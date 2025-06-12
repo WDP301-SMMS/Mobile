@@ -202,6 +202,7 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
+                      numberOfLines={1}
                     />
                   </View>
                 )}
@@ -298,6 +299,7 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
+                      numberOfLines={1}
                     />
                     <TouchableOpacity
                       onPress={() => setShowNewPassword(!showNewPassword)}
@@ -338,6 +340,7 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
+                      numberOfLines={1}
                     />
                     <TouchableOpacity
                       onPress={() =>

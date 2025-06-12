@@ -107,6 +107,7 @@ export default function RegisterParentScreen() {
                 className="flex-1 text-base text-gray-800"
                 placeholderTextColor="#9ca3af"
                 onChangeText={(text) => setValue("fullName", text)}
+                numberOfLines={1}
               />
             </View>
             {errors.fullName && (
@@ -131,6 +132,7 @@ export default function RegisterParentScreen() {
                 keyboardType="phone-pad"
                 autoCapitalize="none"
                 onChangeText={(text) => setValue("phone", text)}
+                numberOfLines={1}
               />
             </View>
             {errors.phone && (
@@ -150,6 +152,7 @@ export default function RegisterParentScreen() {
                 placeholderTextColor="#9ca3af"
                 autoCapitalize="none"
                 onChangeText={(text) => setValue("password", text)}
+                numberOfLines={1}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
@@ -176,6 +179,7 @@ export default function RegisterParentScreen() {
                 placeholderTextColor="#9ca3af"
                 autoCapitalize="none"
                 onChangeText={(text) => setValue("confirmPassword", text)}
+                numberOfLines={1}
               />
               <TouchableOpacity
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}

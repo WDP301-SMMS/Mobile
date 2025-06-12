@@ -87,6 +87,7 @@ export default function SignInScreen() {
                 keyboardType="phone-pad"
                 autoCapitalize="none"
                 onChangeText={(text) => setValue("phone", text)}
+                numberOfLines={1}
               />
             </View>
             {errors.phone && (
@@ -106,6 +107,7 @@ export default function SignInScreen() {
                 placeholderTextColor="#9ca3af"
                 autoCapitalize="none"
                 onChangeText={(text) => setValue("password", text)}
+                numberOfLines={1}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons

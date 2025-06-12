@@ -7,9 +7,10 @@ module.exports = {
     extend: {
       colors: {
         primary: "#2260FF",
-        secondary: "#21ECFF",
-        tertiary: "#E0F2F7",   // Màu nền cực nhạt, thích hợp cho nền các block hoặc viền nhạt
+        secondary: "#22CEFF",
+        tertiary: "#E0F2F7",
         danger: "#F44336",
+        gold: "#EFBF04",
       },
     },
   },
