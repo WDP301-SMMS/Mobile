@@ -1,5 +1,9 @@
+import { useAuthen } from "@/libs/hooks/useAuthen";
+import { useAppDispatch } from "@/libs/stores";
+import { register } from "@/libs/stores/authenManager/thunk";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,24 +19,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { z } from "zod";
 
 const registerSchema = z
   .object({
-    fullName: z
-      .string({ required_error: "Vui lòng nhập họ và tên của bạn" })
-      .nonempty("Vui lòng nhập họ và tên của bạn"),
-    phone: z
-      .string({ required_error: "Vui lòng nhập số điện thoại liên hệ của bạn" })
-      .nonempty("Vui lòng nhập số điện thoại liên hệ của bạn")
-      .regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ"),
-    password: z
-      .string({ required_error: "Vui lòng nhập mật khẩu" })
-      .nonempty("Vui lòng nhập mật khẩu")
-      .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-    confirmPassword: z
-      .string({ required_error: "Vui lòng xác nhận mật khẩu" })
-      .nonempty("Vui lòng xác nhận mật khẩu"),
+    username: z.string().nonempty("Vui lòng nhập tên đăng nhập"),
+    email: z.string().email("Email không hợp lệ"),
+    dob: z.string().nonempty("Vui lòng chọn ngày sinh"),
+    phone: z.string().regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ"),
+    password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu xác nhận không khớp",
@@ -41,119 +38,119 @@ const registerSchema = z
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
-export default function RegisterParentScreen() {
+export default function SignupScreen() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [dateVisible, setDateVisible] = useState(false);
+  const { loading } = useAuthen();
+  const dispatch = useAppDispatch();
 
   const {
-    register,
     setValue,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
 
+  const dob = watch("dob");
+
   const onSubmit = async (data: RegisterForm) => {
-    setLoading(true);
     try {
+      await dispatch(register(data)).unwrap();
       Alert.alert(
-        "Đăng ký thành công",
-        "Bạn đã đăng ký thành công, vui lòng đăng nhập."
+        "Thành công",
+        "Bạn đã đăng ký thành công! Vui lòng xác nhận thông qua email bạn đã đăng ký"
       );
-      router.push("/(auth)/signin");
-    } catch (error: any) {
-      Alert.alert("Đăng ký thất bại", error.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
+      setTimeout(() => {
+        router.push("/(auth)/signin");
+      }, 5000);
+    } catch (err: any) {
+      Alert.alert("Lỗi đăng ký", err);
     }
+  };
+
+  const handleDateConfirm = (date: Date) => {
+    setValue("dob", dayjs(date).format("DD/MM/YYYY"));
+    setDateVisible(false);
   };
 
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      keyboardVerticalOffset={80}
     >
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center items-center px-6 py-8">
           <Image
             source={require("@/assets/images/splash-icon-blue.png")}
-            className="w-64 h-64 mb-4"
+            className="w-52 h-52 mb-4"
             resizeMode="contain"
           />
-
-          <Text className="text-3xl font-bold text-primary mb-8">
+          <Text className="text-3xl font-bold text-primary mb-6">
             Đăng ký phụ huynh
           </Text>
 
-          <View className="w-full mb-4">
-            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="#6b7280"
-                className="mr-2"
-              />
-              <TextInput
-                placeholder="Họ và tên"
-                className="flex-1 text-base text-gray-800"
-                placeholderTextColor="#9ca3af"
-                onChangeText={(text) => setValue("fullName", text)}
-                numberOfLines={1}
-              />
+          <InputField
+            icon="person-outline"
+            placeholder="Tên đăng nhập"
+            onChangeText={(text) => setValue("username", text)}
+            error={errors.username?.message}
+          />
+
+          <InputField
+            icon="mail-outline"
+            placeholder="Email"
+            keyboardType="email-address"
+            onChangeText={(text) => setValue("email", text)}
+            error={errors.email?.message}
+          />
+
+          <TouchableOpacity
+            onPress={() => setDateVisible(true)}
+            className="w-full mb-4"
+          >
+            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-4 bg-gray-50">
+              <Ionicons name="calendar-outline" size={20} color="#6b7280" />
+              <Text className="ml-2 text-base text-gray-800">
+                {dob || "Chọn ngày sinh"}
+              </Text>
             </View>
-            {errors.fullName && (
+            {errors.dob && (
               <Text className="text-red-500 text-sm pt-1">
-                {errors.fullName.message}
+                {errors.dob.message}
               </Text>
             )}
-          </View>
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={dateVisible}
+            mode="date"
+            onConfirm={handleDateConfirm}
+            onCancel={() => setDateVisible(false)}
+          />
 
-          <View className="w-full mb-4">
-            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
-              <Ionicons
-                name="call-outline"
-                size={20}
-                color="#6b7280"
-                className="mr-2"
-              />
-              <TextInput
-                placeholder="Số điện thoại"
-                className="flex-1 text-base text-gray-800"
-                placeholderTextColor="#9ca3af"
-                keyboardType="phone-pad"
-                autoCapitalize="none"
-                onChangeText={(text) => setValue("phone", text)}
-                numberOfLines={1}
-              />
-            </View>
-            {errors.phone && (
-              <Text className="text-red-500 text-sm pt-1">
-                {errors.phone.message}
-              </Text>
-            )}
-          </View>
+          <InputField
+            icon="call-outline"
+            placeholder="Số điện thoại"
+            keyboardType="phone-pad"
+            onChangeText={(text) => setValue("phone", text)}
+            error={errors.phone?.message}
+          />
 
-          <View className="w-full mb-4">
-            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
-              <Ionicons name="lock-closed-outline" size={20} color="#6b7280" />
-              <TextInput
-                placeholder="Mật khẩu"
-                secureTextEntry={!showPassword}
-                className="flex-1 ml-2 text-base text-gray-800"
-                placeholderTextColor="#9ca3af"
-                autoCapitalize="none"
-                onChangeText={(text) => setValue("password", text)}
-                numberOfLines={1}
-              />
+          <InputField
+            icon="lock-closed-outline"
+            placeholder="Mật khẩu"
+            secureTextEntry={!showPassword}
+            onChangeText={(text) => setValue("password", text)}
+            error={errors.password?.message}
+            rightIcon={
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
                   name={showPassword ? "eye-off-outline" : "eye-outline"}
@@ -161,26 +158,16 @@ export default function RegisterParentScreen() {
                   color="#6b7280"
                 />
               </TouchableOpacity>
-            </View>
-            {errors.password && (
-              <Text className="text-red-500 text-sm pt-1">
-                {errors.password.message}
-              </Text>
-            )}
-          </View>
+            }
+          />
 
-          <View className="w-full mb-6">
-            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
-              <Ionicons name="lock-closed-outline" size={20} color="#6b7280" />
-              <TextInput
-                placeholder="Xác nhận mật khẩu"
-                secureTextEntry={!showConfirmPassword}
-                className="flex-1 ml-2 text-base text-gray-800"
-                placeholderTextColor="#9ca3af"
-                autoCapitalize="none"
-                onChangeText={(text) => setValue("confirmPassword", text)}
-                numberOfLines={1}
-              />
+          <InputField
+            icon="lock-closed-outline"
+            placeholder="Xác nhận mật khẩu"
+            secureTextEntry={!showConfirmPassword}
+            onChangeText={(text) => setValue("confirmPassword", text)}
+            error={errors.confirmPassword?.message}
+            rightIcon={
               <TouchableOpacity
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
               >
@@ -190,16 +177,11 @@ export default function RegisterParentScreen() {
                   color="#6b7280"
                 />
               </TouchableOpacity>
-            </View>
-            {errors.confirmPassword && (
-              <Text className="text-red-500 text-sm pt-1">
-                {errors.confirmPassword.message}
-              </Text>
-            )}
-          </View>
+            }
+          />
 
           <TouchableOpacity
-            className="bg-primary py-2 rounded-full w-full mb-4 shadow-md active:opacity-80"
+            className="bg-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80"
             onPress={handleSubmit(onSubmit)}
             disabled={loading}
           >
@@ -221,5 +203,42 @@ export default function RegisterParentScreen() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+  );
+}
+
+function InputField({
+  icon,
+  placeholder,
+  secureTextEntry,
+  keyboardType,
+  onChangeText,
+  error,
+  rightIcon,
+}: {
+  icon: any;
+  placeholder: string;
+  secureTextEntry?: boolean;
+  keyboardType?: any;
+  onChangeText: (text: string) => void;
+  error?: string;
+  rightIcon?: React.ReactNode;
+}) {
+  return (
+    <View className="w-full mb-4">
+      <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
+        <Ionicons name={icon} size={20} color="#6b7280" />
+        <TextInput
+          placeholder={placeholder}
+          secureTextEntry={secureTextEntry}
+          keyboardType={keyboardType}
+          className="flex-1 ml-2 text-base text-gray-800"
+          placeholderTextColor="#9ca3af"
+          autoCapitalize="none"
+          onChangeText={onChangeText}
+        />
+        {rightIcon}
+      </View>
+      {error && <Text className="text-red-500 text-sm pt-1">{error}</Text>}
+    </View>
   );
 }

@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     const storedToken = await SecureStore.getItemAsync("authToken");
     const storedRole = await SecureStore.getItemAsync("role");
+    const storedID = await SecureStore.getItemAsync("accountID");
 
     if (storedToken) {
       const payload = parseJwt(storedToken);
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         await SecureStore.deleteItemAsync("authToken");
         await SecureStore.deleteItemAsync("role");
+        await SecureStore.deleteItemAsync("accountID");
         setToken(null);
         setRole(null);
       }
@@ -59,9 +61,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     await SecureStore.deleteItemAsync("authToken");
     await SecureStore.deleteItemAsync("role");
+    await SecureStore.deleteItemAsync("accountID");
     setToken(null);
     setRole(null);
-    router.replace("/(auth)/login");
+    router.replace("/(auth)/signin");
   };
 
   return (

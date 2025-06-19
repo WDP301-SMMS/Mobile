@@ -57,7 +57,7 @@ export default function TabLayout() {
           headerShown: true,
           headerTitle: "Đơn & Kết quả",
           headerTitleAlign: "center",
-          title: "Đơn $ Kết quả",
+          title: "Đơn & Kết quả",
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={28} name="description" color={color} />
           ),

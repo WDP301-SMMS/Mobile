@@ -1,26 +1,32 @@
+import { useAuth } from "@/libs/context/AuthContext";
+import { useAuthen } from "@/libs/hooks/useAuthen";
+import { useAppDispatch } from "@/libs/stores";
+import { login } from "@/libs/stores/authenManager/thunk";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { z } from "zod";
 
 const loginSchema = z.object({
-  phone: z
-    .string({ required_error: "Vui lòng nhập số điện thoại" })
-    .nonempty("Vui lòng nhập số điện thoại")
-    .regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ"),
+  email: z
+    .string({ required_error: "Vui lòng nhập email" })
+    .nonempty("Vui lòng nhập email")
+    .email("Email không hợp lệ"),
   password: z
     .string({ required_error: "Vui lòng nhập mật khẩu" })
     .nonempty("Vui lòng nhập mật khẩu"),
@@ -31,9 +37,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function SignInScreen() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useAppDispatch();
+  const { loading } = useAuthen();
+  const { reloadAuth } = useAuth();
 
   const {
-    register,
     setValue,
     handleSubmit,
     formState: { errors },
@@ -43,9 +51,20 @@ export default function SignInScreen() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      router.push("/(tabs)");
-    } catch (error: any) {
-      Alert.alert("Đăng nhập thất bại", error);
+      await dispatch(login(data)).unwrap();
+      await reloadAuth();
+
+      const role = await SecureStore.getItemAsync("role");
+      if (role === "Parent") {
+        router.push("/(tabs)");
+      } else {
+        Alert.alert(
+          "Lỗi",
+          "Không xác định được vai trò người dùng hoặc vai trò không hợp lệ"
+        );
+      }
+    } catch (err: any) {
+      Alert.alert("Lỗi đăng nhập", err);
     }
   };
 
@@ -75,24 +94,24 @@ export default function SignInScreen() {
           <View className="w-full mb-4">
             <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
               <Ionicons
-                name="call-outline"
+                name="mail-outline"
                 size={20}
                 color="#6b7280"
                 className="mr-2"
               />
               <TextInput
-                placeholder="Số điện thoại"
+                placeholder="Email"
                 className="flex-1 text-base text-gray-800"
                 placeholderTextColor="#9ca3af"
-                keyboardType="phone-pad"
                 autoCapitalize="none"
-                onChangeText={(text) => setValue("phone", text)}
+                keyboardType="email-address"
+                onChangeText={(text) => setValue("email", text)}
                 numberOfLines={1}
               />
             </View>
-            {errors.phone && (
+            {errors.email && (
               <Text className="text-red-500 text-sm pt-1">
-                {errors.phone.message}
+                {errors.email.message}
               </Text>
             )}
           </View>
@@ -138,9 +157,13 @@ export default function SignInScreen() {
             className="bg-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80"
             onPress={handleSubmit(onSubmit)}
           >
-            <Text className="text-white text-center font-semibold text-lg">
-              Đăng nhập
-            </Text>
+            {loading ? (
+              <ActivityIndicator className="text-xl text-white" />
+            ) : (
+              <Text className="text-white text-center font-semibold text-lg">
+                Đăng nhập
+              </Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity className="bg-white border border-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80 flex-row justify-center items-center">

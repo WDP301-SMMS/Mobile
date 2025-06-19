@@ -1,6 +1,14 @@
+import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const currentUser = {
   fullName: "Võ Văn Phụ Huynh",
@@ -10,6 +18,8 @@ const currentUser = {
 };
 
 export default function InfoScreen() {
+  const { logout } = useAuth();
+
   return (
     <ScrollView className="flex-1 bg-white pt-8">
       <View className="px-6 pb-6 border-b border-gray-100 items-center">
@@ -73,7 +83,14 @@ export default function InfoScreen() {
         <TouchableOpacity
           className="flex-row items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-red-300 mt-6"
           onPress={() => {
-            console.log("Người dùng đã đăng xuất");
+            Alert.alert(
+              "Xác nhận Đăng xuất",
+              "Bạn có chắc muốn đăng xuất khỏi tài khoản không?",
+              [
+                { text: "Hủy", style: "cancel" },
+                { text: "Đăng xuất", onPress: logout, style: "destructive" },
+              ]
+            );
           }}
         >
           <View className="flex-row items-center">
