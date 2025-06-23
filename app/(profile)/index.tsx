@@ -1,4 +1,4 @@
-import { useUser } from "@/libs/hooks/useUser";
+import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
@@ -20,11 +20,13 @@ export default function ProfileScreen() {
     id: "user123",
     fullName: "Võ Văn Phụ Huynh",
     email: "phuhuynh.a@example.com",
+    phoneNumber: "0901 234 567",
+    dob: "25/10/1985",
     gender: "Nam",
     role: "Phụ huynh",
     avatar: "https://i.pravatar.cc/150?img=15",
   });
-  const { info } = useUser();
+  const { user } = useAuth();
   const formatDate = (isoDate?: string) => {
     if (!isoDate) return "";
     const date = new Date(isoDate);
@@ -40,9 +42,11 @@ export default function ProfileScreen() {
           resizeMode="cover"
         />
         <Text className="text-2xl font-bold text-primary mb-1">
-          {info?.username}
+          {user.username}
         </Text>
-        <Text className="text-base text-gray-700">{userProfile.role}</Text>
+        <Text className="text-base text-gray-700">
+          {user?.role === "Parent" ? "Phụ huynh" : user?.role}
+        </Text>
       </View>
 
       <View className="px-6 py-6">
@@ -50,7 +54,7 @@ export default function ProfileScreen() {
           <MaterialIcons name="email" size={24} color="#6B7280" />
           <View className="ml-3">
             <Text className="text-sm font-semibold text-gray-700">Email</Text>
-            <Text className="text-base text-gray-800">{info?.email}</Text>
+            <Text className="text-base text-gray-800">{user?.email}</Text>
           </View>
         </View>
 
@@ -61,7 +65,7 @@ export default function ProfileScreen() {
               <Text className="text-sm font-semibold text-gray-700">
                 Số điện thoại
               </Text>
-              <Text className="text-base text-gray-800">{info?.phone}</Text>
+              <Text className="text-base text-gray-800">{user?.phone}</Text>
             </View>
           </View>
         )}
@@ -74,7 +78,7 @@ export default function ProfileScreen() {
                 Ngày sinh
               </Text>
               <Text className="text-base text-gray-800">
-                {formatDate(info?.dob)}
+                {formatDate(user?.dob)}
               </Text>
             </View>
           </View>

@@ -44,16 +44,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkLoginStatus = useCallback(async () => {
     setLoading(true);
     const storedToken = await SecureStore.getItemAsync("authToken");
-
     if (!storedToken) {
       setLoading(false);
       return;
     }
 
     try {
-      await dispatch(getUser());
-
-      setUser(info);
+      const res = await dispatch(getUser()).unwrap();
+      setUser(res.data);
       setToken(storedToken);
       setIsLoggedIn(true);
     } catch (err) {
@@ -64,20 +62,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     checkLoginStatus();
-  }, [pathname]);
+  }, [pathname, checkLoginStatus]);
 
   const signin = async (newToken: string) => {
     setLoading(true);
     await SecureStore.setItemAsync("authToken", newToken);
 
     try {
-      await dispatch(getUser());
-
-      setUser(info);
+      const res = await dispatch(getUser()).unwrap();
+      setUser(res.data);
       setToken(newToken);
       setIsLoggedIn(true);
       router.replace("/(tabs)");

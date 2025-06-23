@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function FormScreen() {
+export default function ScheduleScreen() {
   return (
     <View>
-      <Text>Form</Text>
+      <Text>Schedule</Text>
     </View>
   );
 }

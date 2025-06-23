@@ -55,11 +55,11 @@ export default function TabLayout() {
           },
           headerTintColor: "#fff",
           headerShown: true,
-          headerTitle: "Đơn & Kết quả",
+          headerTitle: "Sức khỏe",
           headerTitleAlign: "center",
-          title: "Đơn & Kết quả",
+          title: "Sức khỏe",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons size={28} name="description" color={color} />
+            <MaterialIcons size={28} name="health-and-safety" color={color} />
           ),
         }}
       />

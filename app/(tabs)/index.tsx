@@ -24,7 +24,7 @@ export default function HomeScreen() {
                 className="w-14 h-14 rounded-full border-2 border-secondary"
               />
               <Text className="text-xl font-bold text-white ml-2">
-                {user.username}
+                {user?.username}
               </Text>
             </TouchableOpacity>
           </Link>

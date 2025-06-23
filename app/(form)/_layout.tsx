@@ -1,19 +1,11 @@
 import { Stack } from "expo-router";
-import React from "react";
 
-export default function StackLayout() {
+export default function FormLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
-        headerTitleAlign: "center",
-        headerTintColor: "#fff",
-        headerStyle: {
-          backgroundColor: "#2260FF",
-        },
+        headerShown: false,
       }}
-    >
-      <Stack.Screen name="[id]" options={{ title: "Đơn & Kết quả" }} />
-    </Stack>
+    />
   );
 }

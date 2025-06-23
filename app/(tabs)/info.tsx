@@ -1,5 +1,4 @@
 import { useAuth } from "@/libs/context/AuthContext";
-import { useUser } from "@/libs/hooks/useUser";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import {
@@ -16,8 +15,7 @@ const currentUser = {
 };
 
 export default function InfoScreen() {
-  const { logout } = useAuth();
-  const { info } = useUser();
+  const { logout, user } = useAuth();
 
   return (
     <ScrollView className="flex-1 bg-white pt-8">
@@ -28,12 +26,12 @@ export default function InfoScreen() {
           resizeMode="cover"
         />
         <Text className="text-2xl font-bold text-primary mb-1">
-          {info?.username}
+          {user?.username}
         </Text>
         <Text className="text-base text-gray-700">
-          {info?.role === "Parent" ? "Phụ huynh" : info?.role}
+          {user?.role === "Parent" ? "Phụ huynh" : user?.role}
         </Text>
-        <Text className="text-sm text-gray-500 mt-1">{info?.phone}</Text>
+        <Text className="text-sm text-gray-500 mt-1">{user?.phone}</Text>
       </View>
 
       <View className="px-6 py-6">
