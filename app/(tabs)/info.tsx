@@ -1,4 +1,5 @@
 import { useAuth } from "@/libs/context/AuthContext";
+import { useUser } from "@/libs/hooks/useUser";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import {
@@ -11,14 +12,12 @@ import {
 } from "react-native";
 
 const currentUser = {
-  fullName: "Võ Văn Phụ Huynh",
-  phone: "0958491234",
   avatar: "https://i.pravatar.cc/150?img=15",
-  role: "Phụ huynh",
 };
 
 export default function InfoScreen() {
   const { logout } = useAuth();
+  const { info } = useUser();
 
   return (
     <ScrollView className="flex-1 bg-white pt-8">
@@ -29,10 +28,12 @@ export default function InfoScreen() {
           resizeMode="cover"
         />
         <Text className="text-2xl font-bold text-primary mb-1">
-          {currentUser.fullName}
+          {info?.username}
         </Text>
-        <Text className="text-base text-gray-700">{currentUser.role}</Text>
-        <Text className="text-sm text-gray-500 mt-1">{currentUser.phone}</Text>
+        <Text className="text-base text-gray-700">
+          {info?.role === "Parent" ? "Phụ huynh" : info?.role}
+        </Text>
+        <Text className="text-sm text-gray-500 mt-1">{info?.phone}</Text>
       </View>
 
       <View className="px-6 py-6">

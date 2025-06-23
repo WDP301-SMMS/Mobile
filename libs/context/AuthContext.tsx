@@ -1,75 +1,113 @@
-// AuthContext.tsx
-import { parseJwt } from "@/libs/utils/auth";
-import { router } from "expo-router";
+import api from "@/libs/hooks/axiosInstance";
+import { getUser } from "@/libs/stores/userManager/thunk";
+import { router, usePathname } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useUser } from "../hooks/useUser";
+import { useAppDispatch } from "../stores";
 
 type AuthContextType = {
-  role: string | null;
+  user: any;
   token: string | null;
-  isLoading: boolean;
-  logout: () => void;
-  reloadAuth: () => Promise<void>;
+  isLoggedIn: boolean;
+  loading: boolean;
+  signin: (token: string) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
-  role: null,
+  user: null,
   token: null,
-  isLoading: true,
-  logout: () => {},
-  reloadAuth: async () => {},
+  isLoggedIn: false,
+  loading: true,
+  signin: async () => {},
+  logout: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [role, setRole] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const dispatch = useAppDispatch();
+  const { info } = useUser();
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
+  const checkLoginStatus = useCallback(async () => {
+    setLoading(true);
     const storedToken = await SecureStore.getItemAsync("authToken");
-    const storedRole = await SecureStore.getItemAsync("role");
-    const storedID = await SecureStore.getItemAsync("accountID");
 
-    if (storedToken) {
-      const payload = parseJwt(storedToken);
-      const now = Math.floor(Date.now() / 1000);
-      if (payload?.exp && payload.exp > now) {
-        setToken(storedToken);
-        setRole(storedRole || null);
-      } else {
-        await SecureStore.deleteItemAsync("authToken");
-        await SecureStore.deleteItemAsync("role");
-        await SecureStore.deleteItemAsync("accountID");
-        setToken(null);
-        setRole(null);
-      }
-    } else {
-      setToken(null);
-      setRole(null);
+    if (!storedToken) {
+      setLoading(false);
+      return;
     }
 
-    setIsLoading(false);
+    try {
+      await dispatch(getUser());
+
+      setUser(info);
+      setToken(storedToken);
+      setIsLoggedIn(true);
+    } catch (err) {
+      await SecureStore.deleteItemAsync("authToken");
+      setUser(null);
+      setToken(null);
+      setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    checkLoginStatus();
+  }, [pathname]);
+
+  const signin = async (newToken: string) => {
+    setLoading(true);
+    await SecureStore.setItemAsync("authToken", newToken);
+
+    try {
+      await dispatch(getUser());
+
+      setUser(info);
+      setToken(newToken);
+      setIsLoggedIn(true);
+      router.replace("/(tabs)");
+    } catch (err) {
+      await SecureStore.deleteItemAsync("authToken");
+      setUser(null);
+      setToken(null);
+      setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const logout = async () => {
-    await SecureStore.deleteItemAsync("authToken");
-    await SecureStore.deleteItemAsync("role");
-    await SecureStore.deleteItemAsync("accountID");
-    setToken(null);
-    setRole(null);
-    router.replace("/(auth)/signin");
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.warn("Logout error", err);
+    } finally {
+      await SecureStore.deleteItemAsync("authToken");
+      setUser(null);
+      setToken(null);
+      setIsLoggedIn(false);
+      router.replace("/(auth)/signin");
+    }
   };
 
   return (
     <AuthContext.Provider
-      value={{ role, token, isLoading, logout, reloadAuth: load }}
+      value={{ user, token, isLoggedIn, loading, signin, logout }}
     >
       {children}
     </AuthContext.Provider>

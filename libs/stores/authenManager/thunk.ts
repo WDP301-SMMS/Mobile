@@ -10,20 +10,21 @@ export const login = createAsyncThunk(
     try {
       const response = await manageAuthen.login(req);
       const token = response.data?.data.accessToken;
-      const role = response.data?.data.user.role;
-
-      const allowedRoles = ["Parent"];
-      if (!token || !role || !allowedRoles.includes(role)) {
-        return rejectWithValue("Bạn không có quyền truy cập vào ứng dụng này");
-      }
 
       const accountID = parseJwt(token);
+      await SecureStore.setItemAsync("role", accountID.role);
+
+      const allowedRoles = ["Parent"];
+      if (!token || !allowedRoles.includes(accountID.role)) {
+        await SecureStore.deleteItemAsync("role");
+        return rejectWithValue("Bạn không có quyền truy cập vào ứng dụng này");
+      }
       await SecureStore.setItemAsync("authToken", token);
-      await SecureStore.setItemAsync("role", role);
-      await SecureStore.setItemAsync("accountID", accountID.id);
+      await SecureStore.setItemAsync("accountID", accountID._id);
 
       return response.data;
     } catch (error) {
+      console.log(error)
       return rejectWithValue("Email hoặc mật khẩu không đúng.");
     }
   }

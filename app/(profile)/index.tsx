@@ -1,3 +1,4 @@
+import { useUser } from "@/libs/hooks/useUser";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
@@ -19,12 +20,16 @@ export default function ProfileScreen() {
     id: "user123",
     fullName: "Võ Văn Phụ Huynh",
     email: "phuhuynh.a@example.com",
-    phoneNumber: "0901 234 567",
-    dob: "25/10/1985",
     gender: "Nam",
     role: "Phụ huynh",
     avatar: "https://i.pravatar.cc/150?img=15",
   });
+  const { info } = useUser();
+  const formatDate = (isoDate?: string) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("vi-VN");
+  };
 
   return (
     <ScrollView className="flex-1 bg-white pt-8">
@@ -35,7 +40,7 @@ export default function ProfileScreen() {
           resizeMode="cover"
         />
         <Text className="text-2xl font-bold text-primary mb-1">
-          {userProfile.fullName}
+          {info?.username}
         </Text>
         <Text className="text-base text-gray-700">{userProfile.role}</Text>
       </View>
@@ -45,7 +50,7 @@ export default function ProfileScreen() {
           <MaterialIcons name="email" size={24} color="#6B7280" />
           <View className="ml-3">
             <Text className="text-sm font-semibold text-gray-700">Email</Text>
-            <Text className="text-base text-gray-800">{userProfile.email}</Text>
+            <Text className="text-base text-gray-800">{info?.email}</Text>
           </View>
         </View>
 
@@ -56,9 +61,7 @@ export default function ProfileScreen() {
               <Text className="text-sm font-semibold text-gray-700">
                 Số điện thoại
               </Text>
-              <Text className="text-base text-gray-800">
-                {userProfile.phoneNumber}
-              </Text>
+              <Text className="text-base text-gray-800">{info?.phone}</Text>
             </View>
           </View>
         )}
@@ -70,7 +73,9 @@ export default function ProfileScreen() {
               <Text className="text-sm font-semibold text-gray-700">
                 Ngày sinh
               </Text>
-              <Text className="text-base text-gray-800">{userProfile.dob}</Text>
+              <Text className="text-base text-gray-800">
+                {formatDate(info?.dob)}
+              </Text>
             </View>
           </View>
         )}

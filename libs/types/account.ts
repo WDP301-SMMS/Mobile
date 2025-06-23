@@ -11,3 +11,12 @@ export interface SignUp {
   dob: string;
   phone: string;
 }
+
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+  dob: string;
+  phone: string;
+}

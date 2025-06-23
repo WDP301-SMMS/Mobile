@@ -1,3 +1,4 @@
+import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -10,6 +11,7 @@ export default function HomeScreen() {
     month: "long",
     year: "numeric",
   });
+  const { user } = useAuth();
 
   return (
     <ScrollView className="flex-1 bg-white pt-10">
@@ -22,7 +24,7 @@ export default function HomeScreen() {
                 className="w-14 h-14 rounded-full border-2 border-secondary"
               />
               <Text className="text-xl font-bold text-white ml-2">
-                Võ Văn Phụ Huynh
+                {user.username}
               </Text>
             </TouchableOpacity>
           </Link>

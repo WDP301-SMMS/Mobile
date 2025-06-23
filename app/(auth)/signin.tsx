@@ -5,20 +5,19 @@ import { login } from "@/libs/stores/authenManager/thunk";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { z } from "zod";
 
@@ -39,7 +38,7 @@ export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
   const { loading } = useAuthen();
-  const { reloadAuth } = useAuth();
+  const { signin } = useAuth();
 
   const {
     setValue,
@@ -51,20 +50,11 @@ export default function SignInScreen() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await dispatch(login(data)).unwrap();
-      await reloadAuth();
-
-      const role = await SecureStore.getItemAsync("role");
-      if (role === "Parent") {
-        router.push("/(tabs)");
-      } else {
-        Alert.alert(
-          "Lỗi",
-          "Không xác định được vai trò người dùng hoặc vai trò không hợp lệ"
-        );
-      }
+      const response = await dispatch(login(data)).unwrap();
+      await signin(response.data.accessToken);
     } catch (err: any) {
-      Alert.alert("Lỗi đăng nhập", err);
+      console.log("Login error:", err);
+      Alert.alert("Lỗi đăng nhập", err?.message || "Vui lòng thử lại sau.");
     }
   };
 
