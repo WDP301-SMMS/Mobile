@@ -132,9 +132,7 @@ export default function ConsentScreen() {
                 return (
                   <Pressable
                     key={consent._id}
-                    onPress={() =>
-                      router.push(`/(form)/consent/${consent._id}`)
-                    }
+                    onPress={() => router.push(`/(consent)/${consent._id}`)}
                     className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md flex-row items-center justify-between active:bg-gray-50"
                   >
                     <View className="flex-1 pr-4">
@@ -168,9 +166,18 @@ export default function ConsentScreen() {
                       </View>
                       {consent.status === "DECLINED" &&
                         consent.reasonForDeclining && (
-                          <Text className="text-sm text-gray-600 italic mt-3 border-t border-gray-100 pt-2">
-                            📝 Lý do từ chối: {consent.reasonForDeclining}
-                          </Text>
+                          <View className="mt-3 border-t border-gray-100 pt-2">
+                            <View className="flex-row items-center">
+                              <MaterialIcons
+                                name="note-alt"
+                                size={16}
+                                color="rgb(185, 28, 28)"
+                              />
+                              <Text className="ml-1 text-sm text-gray-600 italic">
+                                Lý do từ chối: {consent.reasonForDeclining}
+                              </Text>
+                            </View>
+                          </View>
                         )}
                     </View>
                     <MaterialIcons

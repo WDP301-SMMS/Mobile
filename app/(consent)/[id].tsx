@@ -4,7 +4,7 @@ import {
   getConsentById,
   updateConsentStatus,
 } from "@/libs/stores/consentManager/thunk";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -31,7 +31,7 @@ export default function ConsentDetailScreen() {
 
   const consent = consentDetail?.consents.find((c) => c._id === id);
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (!consent?.campaignId?._id || !consent?.studentId) {
       Alert.alert("Lỗi", "Thiếu thông tin chiến dịch hoặc học sinh.");
       return;
@@ -44,14 +44,19 @@ export default function ConsentDetailScreen() {
         { text: "Hủy", style: "cancel" },
         {
           text: "Đồng ý",
-          onPress: () => {
-            dispatch(
-              updateConsentStatus({
-                campaignId: consent.campaignId._id || consent.campaignId, // Hỗ trợ cả object và string
-                studentId: consent.studentId,
-                status: "APPROVED",
-              })
-            );
+          onPress: async () => {
+            try {
+              await dispatch(
+                updateConsentStatus({
+                  campaignId: consent.campaignId._id,
+                  studentId: consent.studentId,
+                  status: "APPROVED",
+                })
+              ).unwrap();
+              router.push("/(form)/consent/");
+            } catch (error) {
+              Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
+            }
           },
         },
       ]
@@ -64,37 +69,36 @@ export default function ConsentDetailScreen() {
       return;
     }
 
+    if (!reason.trim()) {
+      Alert.alert("Lỗi", "Vui lòng nhập lý do từ chối để tiếp tục.");
+      return;
+    }
+
     Alert.alert(
       "Xác nhận Từ chối",
-      "Vui lòng nhập lý do từ chối:",
+      "Bạn có chắc chắn muốn từ chối phiếu tiêm chủng này?",
       [
-        {
-          text: "Hủy",
-          style: "cancel",
-        },
+        { text: "Hủy", style: "cancel" },
         {
           text: "Từ chối",
-          onPress: () => {
-            if (!reason.trim()) {
-              Alert.alert("Lỗi", "Vui lòng nhập lý do từ chối để tiếp tục.");
-              return;
+          onPress: async () => {
+            try {
+              await dispatch(
+                updateConsentStatus({
+                  campaignId: consent.campaignId._id,
+                  studentId: consent.studentId,
+                  status: "DECLINED",
+                  reasonForDeclining: reason,
+                })
+              ).unwrap();
+              setReason("");
+              router.push("/(form)/consent/");
+            } catch (error) {
+              Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
             }
-            dispatch(
-              updateConsentStatus({
-                campaignId: consent.campaignId._id || consent.campaignId, // Hỗ trợ cả object và string
-                studentId: consent.studentId,
-                status: "DECLINED",
-                reasonForDeclining: reason,
-              })
-            );
-            setReason("");
           },
         },
-      ],
-      {
-        cancelable: true,
-        onDismiss: () => {},
-      }
+      ]
     );
   };
 
@@ -113,11 +117,7 @@ export default function ConsentDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 p-5">
-        <Text className="text-3xl font-extrabold text-center text-blue-800 mb-6">
-          Chi tiết Phiếu Đồng ý
-        </Text>
-
+      <ScrollView className="flex-1 px-5">
         {loading ? (
           <View className="flex-1 justify-center items-center h-64">
             <ActivityIndicator size="large" color="#3B82F6" />

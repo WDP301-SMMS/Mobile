@@ -33,7 +33,20 @@ export default function RootLayout() {
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(form)" options={{ headerShown: false }} />
+            <Stack.Screen name="(consent)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(medical-results)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="(schedule)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(vaccination-history)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(health-profile)"
+              options={{ headerShown: false }}
+            />
             <Stack.Screen name="(profile)" options={{ headerShown: false }} />
             <Stack.Screen
               name="(notification)"

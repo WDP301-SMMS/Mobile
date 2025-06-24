@@ -1,6 +1,3 @@
-import { useAuthen } from "@/libs/hooks/useAuthen";
-import { useAppDispatch } from "@/libs/stores";
-import { register } from "@/libs/stores/authenManager/thunk";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
@@ -22,11 +19,19 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { z } from "zod";
 
+import { useAuthen } from "@/libs/hooks/useAuthen";
+import { useAppDispatch } from "@/libs/stores";
+import { register } from "@/libs/stores/authenManager/thunk";
+
+// Schema có thêm gender
 const registerSchema = z
   .object({
     username: z.string().nonempty("Vui lòng nhập tên đăng nhập"),
     email: z.string().email("Email không hợp lệ"),
     dob: z.string().nonempty("Vui lòng chọn ngày sinh"),
+    gender: z.enum(["MALE", "FEMALE"], {
+      required_error: "Vui lòng chọn giới tính",
+    }),
     phone: z.string().regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ"),
     password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
     confirmPassword: z.string(),
@@ -40,11 +45,12 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function SignupScreen() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading } = useAuthen();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [dateVisible, setDateVisible] = useState(false);
-  const { loading } = useAuthen();
-  const dispatch = useAppDispatch();
 
   const {
     setValue,
@@ -56,6 +62,7 @@ export default function SignupScreen() {
   });
 
   const dob = watch("dob");
+  const gender = watch("gender");
 
   const onSubmit = async (data: RegisterForm) => {
     try {
@@ -67,8 +74,8 @@ export default function SignupScreen() {
       setTimeout(() => {
         router.push("/(auth)/signin");
       }, 5000);
-    } catch (err: any) {
-      Alert.alert("Lỗi đăng ký", err);
+    } catch (error: any) {
+      Alert.alert("Lỗi đăng ký", error.message || "Đăng ký thất bại");
     }
   };
 
@@ -113,6 +120,44 @@ export default function SignupScreen() {
             error={errors.email?.message}
           />
 
+          <View className="w-full mb-4">
+            <Text className="mb-2 text-base font-medium text-gray-800">
+              Giới tính
+            </Text>
+            <View className="flex-row gap-6">
+              {[
+                { label: "Nam", value: "MALE" },
+                { label: "Nữ", value: "FEMALE" },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.value}
+                  onPress={() =>
+                    setValue("gender", item.value as "MALE" | "FEMALE")
+                  }
+                  className="flex-row items-center"
+                >
+                  <View
+                    className={`w-5 h-5 rounded-full border-2 ${
+                      gender === item.value
+                        ? "border-primary"
+                        : "border-gray-400"
+                    } items-center justify-center`}
+                  >
+                    {gender === item.value && (
+                      <View className="w-2.5 h-2.5 rounded-full bg-primary" />
+                    )}
+                  </View>
+                  <Text className="ml-2 text-gray-800">{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {errors.gender && (
+              <Text className="text-red-500 text-sm pt-1">
+                {errors.gender.message}
+              </Text>
+            )}
+          </View>
+
           <TouchableOpacity
             onPress={() => setDateVisible(true)}
             className="w-full mb-4"
@@ -129,6 +174,7 @@ export default function SignupScreen() {
               </Text>
             )}
           </TouchableOpacity>
+
           <DateTimePickerModal
             isVisible={dateVisible}
             mode="date"
@@ -206,6 +252,7 @@ export default function SignupScreen() {
   );
 }
 
+// InputField component (inline)
 function InputField({
   icon,
   placeholder,

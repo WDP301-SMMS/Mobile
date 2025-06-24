@@ -10,6 +10,7 @@ export interface SignUp {
   email: string;
   dob: string;
   phone: string;
+  gender: string;
 }
 
 export interface User {
