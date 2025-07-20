@@ -1,5 +1,5 @@
+import notifee, { AndroidImportance } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import PushNotification from 'react-native-push-notification';
 
 export async function getFcmToken() {
   const authStatus = await messaging().requestPermission();
@@ -18,12 +18,14 @@ export function listenToForegroundMessages() {
   messaging().onMessage(async remoteMessage => {
     console.log('📥 Foreground message:', remoteMessage);
 
-    const { notification, data } = remoteMessage;
-
-    PushNotification.localNotification({
-      channelId: 'default-channel-id',
-      title: notification?.title || data?.title || 'Thông báo',
-      message: notification?.body || data?.body || 'Bạn có thông báo mới',
+    await notifee.displayNotification({
+      title: remoteMessage.notification?.title || remoteMessage.data?.title || 'Thông báo',
+      body: remoteMessage.notification?.body || remoteMessage.data?.body || 'Bạn có thông báo mới',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher', // icon bạn đã cấu hình trong res/
+        importance: AndroidImportance.HIGH,
+      },
     });
   });
 }

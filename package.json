@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@hookform/resolvers": "^5.1.0",
+    "@notifee/react-native": "^9.1.8",
     "@react-native-community/datetimepicker": "^8.4.2",
     "@react-native-firebase/app": "^22.4.0",
     "@react-native-firebase/messaging": "^22.4.0",
@@ -57,7 +58,6 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
-    "@types/react-native-push-notification": "^8.1.4",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~8.0.1",
     "typescript": "~5.8.3"

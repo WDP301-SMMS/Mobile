@@ -1,12 +1,11 @@
-import PushNotification from 'react-native-push-notification';
+import notifee, { AndroidImportance } from '@notifee/react-native';
 
-export function createNotificationChannel() {
-  PushNotification.createChannel(
-    {
-      channelId: 'default-channel-id',
-      channelName: 'Default Channel',
-      importance: 4,
-    },
-    created => console.log(`🔔 Channel created: ${created}`)
-  );
+export async function createNotificationChannel() {
+  const channelId = await notifee.createChannel({
+    id: 'default',
+    name: 'Default Channel',
+    importance: AndroidImportance.HIGH,
+  });
+
+  console.log('🔔 Channel created:', channelId);
 }
