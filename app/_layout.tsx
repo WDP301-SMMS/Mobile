@@ -1,5 +1,10 @@
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
+import {
+  getFcmToken,
+  listenToForegroundMessages,
+} from "@/libs/utils/notification/firebaseNotification";
+import { createNotificationChannel } from "@/libs/utils/notification/initNotificationChannel";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -16,7 +21,13 @@ export default function RootLayout() {
     Montserrat: require("@/assets/fonts/Montserrat-Regular.ttf"),
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
-
+  
+  useEffect(() => {
+    createNotificationChannel(); // Android channel
+    getFcmToken();               // Lấy token
+    listenToForegroundMessages(); // Lắng nghe tin nhắn foreground
+  }, []);
+  
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();

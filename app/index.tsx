@@ -1,4 +1,6 @@
+import '@/libs/utils/notification/firebaseBackgroundHandler';
 import { useRouter } from "expo-router";
+import 'expo-router/entry';
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
