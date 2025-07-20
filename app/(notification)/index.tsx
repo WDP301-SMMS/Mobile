@@ -1,141 +1,211 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-  type: 'general' | 'health' | 'urgent';
-}
+import { useNotification } from "@/libs/hooks/useNotification";
+import { useAppDispatch } from "@/libs/stores";
+import {
+  markAsRead,
+  readAll,
+  unreadCount,
+} from "@/libs/stores/notificationManager/thunk";
+import { Notification } from "@/libs/types/notification";
+import { getNotificationDisplayData } from "@/libs/utils/notification/displayData";
 
 export default function NotificationScreen() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      title: "Lịch hẹn khám sức khỏe mới",
-      message: "Con Nguyễn Văn A có lịch khám định kỳ vào 09:00 ngày 20/07/2025.",
-      timestamp: "1 giờ trước",
-      isRead: false,
-      type: 'health',
-    },
-    {
-      id: "2",
-      title: "Kết quả tiêm chủng",
-      message: "Con Trần Thị B đã hoàn thành mũi tiêm nhắc uốn ván.",
-      timestamp: "3 giờ trước",
-      isRead: false,
-      type: 'health',
-    },
-    {
-      id: "3",
-      title: "Thông báo từ nhà trường",
-      message: "Lịch nghỉ hè sẽ bắt đầu từ ngày 15/07/2025. Vui lòng xem chi tiết trên cổng thông tin.",
-      timestamp: "1 ngày trước",
-      isRead: true,
-      type: 'general',
-    },
-    {
-      id: "4",
-      title: "Nhắc nhở nộp phiếu đồng ý",
-      message: "Bạn có phiếu đồng ý khám tổng quát cho con Lê Minh C cần phản hồi trước ngày 07/06/2025.",
-      timestamp: "2 ngày trước",
-      isRead: false,
-      type: 'urgent',
-    },
-    {
-      id: "5",
-      title: "Tin nhắn mới",
-      message: "Bạn có tin nhắn từ giáo viên chủ nhiệm lớp 3A.",
-      timestamp: "3 ngày trước",
-      isRead: true,
-      type: 'general',
-    },
-    {
-      id: "6",
-      title: "Cập nhật hồ sơ sức khỏe",
-      message: "Hồ sơ sức khỏe của con Phạm Thị D đã được cập nhật thông tin về dị ứng.",
-      timestamp: "4 ngày trước",
-      isRead: true,
-      type: 'health',
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { notifications: initialNotifications, loading } = useNotification();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const markAsRead = (id: string) => {
-    setNotifications(prevNotifications =>
-      prevNotifications.map(notif =>
-        notif.id === id ? { ...notif, isRead: true } : notif
-      )
+  // Sync local notifications only once after loading
+  useEffect(() => {
+    if (initialNotifications.length > 0 && notifications.length === 0) {
+      setNotifications(initialNotifications);
+    }
+  }, [initialNotifications]);
+
+  useEffect(() => {
+    dispatch(unreadCount());
+  }, [dispatch]);
+
+  const markAsReadNoti = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
     );
+    dispatch(markAsRead(id));
+    dispatch(unreadCount());
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prevNotifications =>
-      prevNotifications.map(notif => ({ ...notif, isRead: true }))
-    );
+  const markAll = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    dispatch(readAll());
+    dispatch(unreadCount());
   };
 
-  const getNotificationIcon = (type: Notification['type']) => {
+  const countUnread = notifications.filter((n) => !n.isRead).length;
+
+  const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'health':
+      case "HEALTH_CHECK_CAMPAIGN_NEW":
+      case "HEALTH_CHECK_RESULT_READY":
         return { name: "healing", color: "#28B463" };
-      case 'urgent':
-        return { name: "warning", color: "#E74C3C" };
-      case 'general':
+      case "VACCINE_CAMPAIGN_NEW":
+        return { name: "local-hospital", color: "#17A589" };
+      case "MEDICATION_REQUEST_SCHEDULED":
+      case "MEDICATION_REQUEST_COMPLETED":
+      case "MEDICATION_REQUEST_REJECTED":
+        return { name: "medication", color: "#CA6F1E" };
+      case "MEETING_SCHEDULE_NEW":
+      case "MEETING_SCHEDULE_UPDATED":
+      case "MEETING_SCHEDULE_CANCELED":
+        return { name: "event", color: "#5D6D7E" };
+      case "MEDICAL_INCIDENT_PARENT_ALERT":
+        return { name: "priority-high", color: "#E74C3C" };
+      case "PARENT_SUBMITTED_CONSENT":
+        return { name: "assignment-turned-in", color: "#1F618D" };
+      case "NEW_MEDICATION_REQUEST_RECEIVED":
+        return { name: "playlist-add-check", color: "#884EA0" };
+      case "MEDICAL_INCIDENT_NEW":
+        return { name: "report", color: "#E67E22" };
+      case "INVENTORY_ITEM_LOW_STOCK":
+        return { name: "inventory", color: "#BA4A00" };
+      case "CHAT_MESSAGE_NEW":
+        return { name: "chat", color: "#2E86C1" };
       default:
-        return { name: "info-outline", color: "#3498DB" };
+        return { name: "notifications", color: "#3498DB" };
     }
   };
 
   return (
-    <ScrollView className="flex-1 bg-white pt-4">
+    <ScrollView className="flex-1 bg-gray-100 pt-6">
+      <View className="px-5 pb-10">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-2xl font-bold text-black">Thông báo</Text>
+          {countUnread > 0 && (
+            <View className="bg-red-600 px-3 py-1 rounded-full">
+              <Text className="text-white text-xs font-bold">
+                {countUnread} chưa đọc
+              </Text>
+            </View>
+          )}
+        </View>
 
-      <View className="px-6 pb-4 flex-row justify-end items-center border-b border-gray-100">
-        {notifications.some(notif => !notif.isRead) && (
-          <TouchableOpacity onPress={markAllAsRead} className="px-3 py-1 rounded-full bg-blue-100">
-            <Text className="text-sm font-semibold text-blue-700">Đánh dấu tất cả đã đọc</Text>
+        {countUnread > 0 && (
+          <TouchableOpacity
+            onPress={markAll}
+            className="bg-blue-600 py-3 rounded-xl mb-5 items-center flex-row justify-center space-x-2"
+          >
+            <MaterialIcons name="done-all" size={20} color="#fff" />
+            <Text className="ml-2 text-white font-semibold text-base">
+              Đánh dấu tất cả là đã đọc
+            </Text>
           </TouchableOpacity>
         )}
-      </View>
 
-      <View className="px-6 py-4">
-        {notifications.length > 0 ? (
+        {loading ? (
+          <View className="items-center justify-center mt-20">
+            <ActivityIndicator size="large" color="#3498DB" />
+            <Text className="mt-3 text-gray-500 text-sm">
+              Đang tải thông báo...
+            </Text>
+          </View>
+        ) : notifications.length > 0 ? (
           notifications.map((notif) => {
             const icon = getNotificationIcon(notif.type);
+            const display = getNotificationDisplayData(notif);
+            const date = new Date(notif.createdAt).toLocaleString("vi-VN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            });
+
             return (
-              <TouchableOpacity
-                key={notif.id}
-                onPress={() => markAsRead(notif.id)}
-                className={`flex-row items-start p-4 rounded-xl mb-3 shadow-sm border
-                  ${notif.isRead ? "bg-gray-50 border-gray-200" : "bg-white border-secondary"}`}
+              <View
+                key={notif._id}
+                className={`rounded-2xl mb-4 border shadow-sm ${
+                  notif.isRead
+                    ? "bg-white border-gray-200"
+                    : "bg-blue-50 border-blue-300"
+                }`}
               >
-                <View className="mr-3 mt-1">
-                  <MaterialIcons name={icon.name as any} size={24} color={icon.color} />
-                  {!notif.isRead && (
-                    <View className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
-                  )}
+                <View className="flex-row px-4 pt-4 pb-2">
+                  <View className="relative w-12 h-12 rounded-full bg-white items-center justify-center border border-gray-300 mr-4 mt-1.5">
+                    <MaterialIcons
+                      name={icon.name as any}
+                      size={30}
+                      color={icon.color}
+                    />
+                    {!notif.isRead && (
+                      <View className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
+                    )}
+                  </View>
+
+                  <View className="flex-1 pr-2">
+                    <View className="flex-row justify-between items-start mb-1">
+                      <Text
+                        className={`text-base flex-1 ${
+                          notif.isRead
+                            ? "text-gray-700 font-normal"
+                            : "text-blue-900 font-bold"
+                        }`}
+                      >
+                        {display.title}
+                      </Text>
+                      <Text className="text-xs text-blue-700 font-semibold">
+                        {date}
+                      </Text>
+                    </View>
+
+                    <Text
+                      className={`text-sm ${
+                        notif.isRead ? "text-gray-500" : "text-gray-700"
+                      }`}
+                    >
+                      {display.body}
+                    </Text>
+                  </View>
                 </View>
 
-                <View className="flex-1">
-                  <Text className={`text-base ${notif.isRead ? "text-gray-700 font-normal" : "text-primary font-bold"}`}>
-                    {notif.title}
-                  </Text>
-                  <Text className={`text-sm mt-1 ${notif.isRead ? "text-gray-500" : "text-gray-600"}`}>
-                    {notif.message}
-                  </Text>
-                  <Text className="text-xs text-gray-400 mt-2">
-                    {notif.timestamp}
-                  </Text>
+                <View className="px-4 pb-4 pt-2">
+                  {notif.isRead ? (
+                    <View className="flex-row items-center justify-center bg-gray-200 py-2 rounded-xl space-x-2">
+                      <MaterialIcons
+                        name="check-circle"
+                        size={18}
+                        color="#4CAF50"
+                      />
+                      <Text className="ml-2 text-gray-700 font-medium text-sm">
+                        Đã đọc
+                      </Text>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => markAsReadNoti(notif._id)}
+                      className="bg-blue-500 py-2 px-4 rounded-xl flex-row items-center justify-center space-x-2"
+                    >
+                      <MaterialIcons name="done" size={18} color="#fff" />
+                      <Text className="ml-2 text-white font-semibold text-sm">
+                        Đánh dấu đã đọc
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
-              </TouchableOpacity>
+              </View>
             );
           })
         ) : (
-          <View className="bg-gray-50 p-4 rounded-lg items-center justify-center mt-4">
-            <MaterialIcons name="inbox" size={40} color="#B0BEC5" />
-            <Text className="text-gray-600 text-base mt-2 text-center">
+          <View className="bg-white p-8 rounded-2xl items-center justify-center mt-10 shadow-sm">
+            <MaterialIcons name="inbox" size={60} color="#B0BEC5" />
+            <Text className="text-gray-600 text-base mt-4 text-center">
               Bạn không có thông báo nào.
             </Text>
           </View>

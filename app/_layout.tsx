@@ -1,5 +1,8 @@
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
+import { NotificationProvider } from "@/libs/context/NotificationContext";
+import { listenToForegroundMessages } from "@/libs/utils/notification/firebaseNotification";
+import { createNotificationChannel } from "@/libs/utils/notification/initNotificationChannel";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -18,6 +21,11 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    createNotificationChannel();
+    listenToForegroundMessages();
+  }, []);
+
+  useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
@@ -30,33 +38,38 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <ReduxProvider>
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(consent)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(medical-results)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(schedule)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(vaccination-history)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(health-profile)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(profile)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(notification)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </AuthProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(consent)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(medical-results)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(schedule)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(vaccination-history)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(health-profile)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(notification)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </AuthProvider>
+        </NotificationProvider>
       </ReduxProvider>
     </ThemeProvider>
   );
