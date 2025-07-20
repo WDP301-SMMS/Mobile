@@ -1,9 +1,9 @@
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   Alert,
-  Image,
   Modal,
   ScrollView,
   Text,
@@ -105,12 +105,12 @@ export default function ChildScreen() {
                 className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-tertiary"
               >
                 <View className="flex-row items-center mb-4">
-                  <Image
-                    source={{ uri: child.avatar }}
-                    className="w-20 h-20 rounded-full border-4 border-secondary mr-4"
-                    resizeMode="cover"
+                  <UserAvatar
+                    username={child.fullName ?? ""}
+                    size={80}
+                    fontSize={22}
                   />
-                  <View className="flex-1">
+                  <View className="flex-1 ml-4">
                     <Text className="text-xl font-bold text-primary mb-1">
                       {child.fullName}
                     </Text>

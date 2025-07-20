@@ -1,9 +1,7 @@
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
-import {
-  getFcmToken,
-  listenToForegroundMessages,
-} from "@/libs/utils/notification/firebaseNotification";
+import { NotificationProvider } from "@/libs/context/NotificationContext";
+import { listenToForegroundMessages } from "@/libs/utils/notification/firebaseNotification";
 import { createNotificationChannel } from "@/libs/utils/notification/initNotificationChannel";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -21,13 +19,12 @@ export default function RootLayout() {
     Montserrat: require("@/assets/fonts/Montserrat-Regular.ttf"),
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
-  
+
   useEffect(() => {
-    createNotificationChannel(); // Android channel
-    getFcmToken();               // Lấy token
-    listenToForegroundMessages(); // Lắng nghe tin nhắn foreground
+    createNotificationChannel();
+    listenToForegroundMessages();
   }, []);
-  
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -41,33 +38,38 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <ReduxProvider>
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(consent)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(medical-results)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(schedule)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(vaccination-history)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(health-profile)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(profile)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(notification)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </AuthProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(consent)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(medical-results)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(schedule)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(vaccination-history)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(health-profile)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(notification)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </AuthProvider>
+        </NotificationProvider>
       </ReduxProvider>
     </ThemeProvider>
   );

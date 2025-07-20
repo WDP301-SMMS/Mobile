@@ -1,18 +1,14 @@
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import {
   Alert,
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-
-const currentUser = {
-  avatar: "https://i.pravatar.cc/150?img=15",
-};
 
 export default function InfoScreen() {
   const { logout, user } = useAuth();
@@ -20,11 +16,7 @@ export default function InfoScreen() {
   return (
     <ScrollView className="flex-1 bg-white pt-8">
       <View className="px-6 pb-6 border-b border-gray-100 items-center">
-        <Image
-          source={{ uri: currentUser.avatar }}
-          className="w-28 h-28 rounded-full border-4 border-primary mb-3"
-          resizeMode="cover"
-        />
+        <UserAvatar username={user?.username ?? ""} size={112} fontSize={42}/>
         <Text className="text-2xl font-bold text-primary mb-1">
           {user?.username}
         </Text>

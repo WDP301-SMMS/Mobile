@@ -1,7 +1,8 @@
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 interface UserProfile {
   id: string;
@@ -36,12 +37,8 @@ export default function ProfileScreen() {
   return (
     <ScrollView className="flex-1 bg-white pt-8">
       <View className="px-6 pb-6 items-center border-b border-gray-100">
-        <Image
-          source={{ uri: userProfile.avatar }}
-          className="w-32 h-32 rounded-full border-4 border-primary mb-3"
-          resizeMode="cover"
-        />
-        <Text className="text-2xl font-bold text-primary mb-1">
+        <UserAvatar username={user?.username ?? ""} size={128} fontSize={42} />
+        <Text className="text-2xl font-bold text-primary mb-1 mt-3">
           {user.username}
         </Text>
         <Text className="text-base text-gray-700">

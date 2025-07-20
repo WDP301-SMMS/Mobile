@@ -1,6 +1,16 @@
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/libs/context/AuthContext";
+import { useNotifications } from "@/libs/context/NotificationContext";
+import { useNotification } from "@/libs/hooks/useNotification";
+import { useAppDispatch } from "@/libs/stores";
+import {
+  registerPushToken,
+  unreadCount,
+} from "@/libs/stores/notificationManager/thunk";
+import { requestPermissionAndGetToken } from "@/libs/utils/notification/firebaseNotification";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { useEffect } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
@@ -12,6 +22,30 @@ export default function HomeScreen() {
     year: "numeric",
   });
   const { user } = useAuth();
+  const { countUnread } = useNotification();
+  const { hasNewNotification } = useNotifications();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (hasNewNotification) {
+      dispatch(unreadCount());
+    }
+  }, [hasNewNotification]);
+
+  useEffect(() => {
+    async function setupPushNotifications() {
+      try {
+        const fcmToken = await requestPermissionAndGetToken();
+        if (fcmToken) {
+          dispatch(registerPushToken(fcmToken));
+        }
+      } catch (error) {
+        console.error("Lỗi khi xin quyền thông báo tại HomeScreen:", error);
+      }
+    }
+
+    setupPushNotifications();
+  }, []);
 
   return (
     <ScrollView className="flex-1 bg-white pt-10">
@@ -19,10 +53,7 @@ export default function HomeScreen() {
         <View className="flex-row items-center justify-between">
           <Link href={"/(tabs)/info"} asChild>
             <TouchableOpacity className="flex-row items-center space-x-4">
-              <Image
-                source={{ uri: "https://i.pravatar.cc/100?img=15" }}
-                className="w-14 h-14 rounded-full border-2 border-secondary"
-              />
+              <UserAvatar username={user?.username ?? ""} />
               <Text className="text-xl font-bold text-white ml-2">
                 {user?.username}
               </Text>
@@ -31,11 +62,20 @@ export default function HomeScreen() {
           <View className="flex-row gap-x-4">
             <Link href={"/(notification)"} asChild>
               <TouchableOpacity className="p-2 rounded-full bg-tertiary">
-                <MaterialIcons
-                  name="notifications-none"
-                  size={24}
-                  color="#2260FF"
-                />
+                <View className="relative">
+                  <MaterialIcons
+                    name="notifications-none"
+                    size={24}
+                    color="#2260FF"
+                  />
+                  {countUnread > 0 && (
+                    <View className="absolute -top-1 -right-1 bg-red-500 min-w-[18px] h-[18px] px-1 rounded-full items-center justify-center">
+                      <Text className="text-white text-[10px] font-bold">
+                        {countUnread > 99 ? "99+" : countUnread}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </TouchableOpacity>
             </Link>
             <Link href={"/(chat)"} asChild>
