@@ -23,8 +23,8 @@ export default function StackLayout() {
           title: "Thông tin cá nhân",
           headerRight: () => (
             <TouchableOpacity
-              onPress={() => {
-                router.push("/(tabs)/info/personal/edit");
+              onPressOut={() => {
+                router.push("/(profile)/edit");
               }}
             >
               <MaterialIcons
@@ -35,6 +35,12 @@ export default function StackLayout() {
               />
             </TouchableOpacity>
           ),
+        }}
+      />
+      <Stack.Screen
+        name="edit"
+        options={{
+          title: "Thông tin cá nhân",
         }}
       />
     </Stack>

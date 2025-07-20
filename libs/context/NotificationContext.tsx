@@ -1,17 +1,24 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-let notifyNewMessageListeners: (() => void)[] = [];
+type NotificationType = "CHAT_MESSAGE_NEW" | string | undefined;
+type NotificationListener = (type?: NotificationType) => void;
 
-export const emitNewNotification = () => {
+let notifyNewMessageListeners: NotificationListener[] = [];
+
+export const emitNewNotification = (type?: NotificationType) => {
   for (const listener of notifyNewMessageListeners) {
-    listener();
+    listener(type);
   }
 };
 
-const NotificationContext = createContext<{
+interface NotificationContextType {
   hasNewNotification: boolean;
   setHasNewNotification: (value: boolean) => void;
-}>(undefined!);
+  hasNewMessage: boolean;
+  setHasNewMessage: (value: boolean) => void;
+}
+
+const NotificationContext = createContext<NotificationContextType>(undefined!);
 
 export const NotificationProvider = ({
   children,
@@ -19,11 +26,15 @@ export const NotificationProvider = ({
   children: React.ReactNode;
 }) => {
   const [hasNewNotification, setHasNewNotification] = useState(false);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
 
   useEffect(() => {
-    const listener = () => {
-      // console.log("🔔 Đã nhận sự kiện từ foreground message");
-      setHasNewNotification(true);
+    const listener: NotificationListener = (type?: NotificationType) => {
+      if (type === "CHAT_MESSAGE_NEW") {
+        setHasNewMessage(true);
+      } else {
+        setHasNewNotification(true);
+      }
     };
 
     notifyNewMessageListeners.push(listener);
@@ -37,7 +48,12 @@ export const NotificationProvider = ({
 
   return (
     <NotificationContext.Provider
-      value={{ hasNewNotification, setHasNewNotification }}
+      value={{
+        hasNewNotification,
+        setHasNewNotification,
+        hasNewMessage,
+        setHasNewMessage,
+      }}
     >
       {children}
     </NotificationContext.Provider>

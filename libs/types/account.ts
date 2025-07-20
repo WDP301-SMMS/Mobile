@@ -18,6 +18,14 @@ export interface User {
   username: string;
   email: string;
   role: string;
+  gender: string;
   dob: string;
   phone: string;
+}
+
+export interface UpdateUser {
+  username: string;
+  dob: string;
+  phone: string;
+  gender: string;
 }

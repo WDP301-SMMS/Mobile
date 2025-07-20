@@ -1,6 +1,6 @@
 import { User } from "@/libs/types/account";
 import { createSlice } from "@reduxjs/toolkit";
-import { getUser } from "./thunk";
+import { getUser, updateUser } from "./thunk";
 
 type stateType = {
   loading: boolean;
@@ -26,6 +26,15 @@ export const manageUserSlice = createSlice({
         state.info = action.payload.data;
       })
       .addCase(getUser.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateUser.rejected, (state) => {
         state.loading = false;
       });
   },

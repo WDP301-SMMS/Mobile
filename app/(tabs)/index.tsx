@@ -9,8 +9,9 @@ import {
 } from "@/libs/stores/notificationManager/thunk";
 import { requestPermissionAndGetToken } from "@/libs/utils/notification/firebaseNotification";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
@@ -23,14 +24,16 @@ export default function HomeScreen() {
   });
   const { user } = useAuth();
   const { countUnread } = useNotification();
-  const { hasNewNotification } = useNotifications();
+  const { hasNewNotification, hasNewMessage } = useNotifications();
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (hasNewNotification) {
-      dispatch(unreadCount());
-    }
-  }, [hasNewNotification]);
+  useFocusEffect(
+    useCallback(() => {
+      if (hasNewNotification) {
+        dispatch(unreadCount());
+      }
+    }, [hasNewNotification, dispatch])
+  );
 
   useEffect(() => {
     async function setupPushNotifications() {
@@ -69,7 +72,7 @@ export default function HomeScreen() {
                     color="#2260FF"
                   />
                   {countUnread > 0 && (
-                    <View className="absolute -top-1 -right-1 bg-red-500 min-w-[18px] h-[18px] px-1 rounded-full items-center justify-center">
+                    <View className="absolute -top-3 -right-2 bg-red-500 min-w-[18px] h-[18px] px-1 rounded-full items-center justify-center">
                       <Text className="text-white text-[10px] font-bold">
                         {countUnread > 99 ? "99+" : countUnread}
                       </Text>
@@ -80,11 +83,16 @@ export default function HomeScreen() {
             </Link>
             <Link href={"/(chat)"} asChild>
               <TouchableOpacity className="p-2 rounded-full bg-tertiary">
-                <MaterialIcons
-                  name="chat-bubble-outline"
-                  size={24}
-                  color="#2260FF"
-                />
+                <View className="relative">
+                  <MaterialIcons
+                    name="chat-bubble-outline"
+                    size={24}
+                    color="#2260FF"
+                  />
+                  {hasNewMessage && (
+                    <View className="absolute -top-3 -right-2 bg-red-500 w-[12px] h-[12px] rounded-full" />
+                  )}
+                </View>
               </TouchableOpacity>
             </Link>
           </View>

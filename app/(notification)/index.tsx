@@ -11,6 +11,7 @@ import {
 import { useNotification } from "@/libs/hooks/useNotification";
 import { useAppDispatch } from "@/libs/stores";
 import {
+  getNotifications,
   markAsRead,
   readAll,
   unreadCount,
@@ -20,10 +21,13 @@ import { getNotificationDisplayData } from "@/libs/utils/notification/displayDat
 
 export default function NotificationScreen() {
   const dispatch = useAppDispatch();
-  const { notifications: initialNotifications, loading } = useNotification();
+  const {
+    notifications: initialNotifications,
+    loading,
+    countUnread,
+  } = useNotification();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Sync local notifications only once after loading
   useEffect(() => {
     if (initialNotifications.length > 0 && notifications.length === 0) {
       setNotifications(initialNotifications);
@@ -31,6 +35,7 @@ export default function NotificationScreen() {
   }, [initialNotifications]);
 
   useEffect(() => {
+    dispatch(getNotifications());
     dispatch(unreadCount());
   }, [dispatch]);
 
@@ -47,8 +52,6 @@ export default function NotificationScreen() {
     dispatch(readAll());
     dispatch(unreadCount());
   };
-
-  const countUnread = notifications.filter((n) => !n.isRead).length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -85,17 +88,6 @@ export default function NotificationScreen() {
   return (
     <ScrollView className="flex-1 bg-gray-100 pt-6">
       <View className="px-5 pb-10">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-2xl font-bold text-black">Thông báo</Text>
-          {countUnread > 0 && (
-            <View className="bg-red-600 px-3 py-1 rounded-full">
-              <Text className="text-white text-xs font-bold">
-                {countUnread} chưa đọc
-              </Text>
-            </View>
-          )}
-        </View>
-
         {countUnread > 0 && (
           <TouchableOpacity
             onPress={markAll}
@@ -103,7 +95,7 @@ export default function NotificationScreen() {
           >
             <MaterialIcons name="done-all" size={20} color="#fff" />
             <Text className="ml-2 text-white font-semibold text-base">
-              Đánh dấu tất cả là đã đọc
+              Đánh dấu tất cả đã đọc
             </Text>
           </TouchableOpacity>
         )}

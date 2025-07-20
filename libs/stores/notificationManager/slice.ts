@@ -1,10 +1,6 @@
 import { Notification } from "@/libs/types/notification";
 import { createSlice } from "@reduxjs/toolkit";
-import {
-    getNotifications,
-    registerPushToken,
-    unreadCount
-} from "./thunk";
+import { getNotifications, registerPushToken, unreadCount } from "./thunk";
 
 type stateType = {
   loading: boolean;

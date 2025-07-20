@@ -9,7 +9,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useUser } from "../hooks/useUser";
 import { useAppDispatch } from "../stores";
 
 type AuthContextType = {
@@ -39,11 +38,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const { info } = useUser();
 
   const checkLoginStatus = useCallback(async () => {
     setLoading(true);
     const storedToken = await SecureStore.getItemAsync("authToken");
+    // console.log("Stored token:", storedToken);
     if (!storedToken) {
       setLoading(false);
       return;
