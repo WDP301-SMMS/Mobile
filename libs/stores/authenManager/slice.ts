@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register } from "./thunk";
+import { forgotPass, login, register, resetPass, verifyOtp } from "./thunk";
 
 type stateType = {
   loading: boolean;
@@ -31,6 +31,33 @@ export const manageAuthenSlice = createSlice({
         state.loading = false;
       })
       .addCase(register.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(forgotPass.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(forgotPass.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(forgotPass.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyOtp.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(resetPass.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(resetPass.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(resetPass.rejected, (state) => {
         state.loading = false;
       });
   },

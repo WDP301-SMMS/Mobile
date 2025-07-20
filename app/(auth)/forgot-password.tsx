@@ -1,3 +1,10 @@
+import { useAuthen } from "@/libs/hooks/useAuthen";
+import { useAppDispatch } from "@/libs/stores";
+import {
+  forgotPass,
+  resetPass,
+  verifyOtp,
+} from "@/libs/stores/authenManager/thunk";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
@@ -16,11 +23,19 @@ import {
 } from "react-native";
 import { z } from "zod";
 
-const phoneSchema = z.object({
-  phone: z
-    .string({ required_error: "Vui lòng nhập số điện thoại" })
-    .nonempty("Vui lòng nhập số điện thoại")
-    .regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ"),
+type FullFormData = {
+  email: string;
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+// --- Schemas ---
+const emailSchema = z.object({
+  email: z
+    .string({ required_error: "Vui lòng nhập email" })
+    .nonempty("Vui lòng nhập email")
+    .email("Email không hợp lệ"),
 });
 
 const otpSchema = z.object({
@@ -45,17 +60,12 @@ const newPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-type PhoneForm = z.infer<typeof phoneSchema>;
-type OtpForm = z.infer<typeof otpSchema>;
-
-type FormStep = {
+const formSteps: {
   step: number;
-  schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>;
-  defaultValues: any;
-};
-
-const formSteps: FormStep[] = [
-  { step: 1, schema: phoneSchema, defaultValues: { phone: "" } },
+  schema: z.ZodType<any>;
+  defaultValues: Partial<FullFormData>;
+}[] = [
+  { step: 1, schema: emailSchema, defaultValues: { email: "" } },
   { step: 2, schema: otpSchema, defaultValues: { otp: "" } },
   {
     step: 3,
@@ -67,8 +77,41 @@ const formSteps: FormStep[] = [
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const dispatch = useAppDispatch();
+  const { loading } = useAuthen();
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (currentStep === 2 && countdown > 0) {
+      setCanResend(false);
+      timer = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      setCanResend(true);
+    }
+
+    return () => clearTimeout(timer);
+  }, [currentStep, countdown]);
+
+  const handleResendOtp = async () => {
+    if (!email) return;
+
+    try {
+      await dispatch(forgotPass({ email }));
+      Alert.alert("Thành công", "Đã gửi lại mã xác nhận.");
+      setCountdown(60);
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể gửi lại mã.");
+    }
+  };
 
   const currentForm = formSteps.find((form) => form.step === currentStep)!;
 
@@ -78,8 +121,8 @@ export default function ForgotPasswordScreen() {
     formState: { errors },
     reset,
     trigger,
-  } = useForm({
-    resolver: zodResolver(currentForm.schema),
+  } = useForm<Partial<FullFormData>>({
+    resolver: zodResolver(currentForm.schema as z.ZodType<any, any, any>),
     defaultValues: currentForm.defaultValues,
   });
 
@@ -87,61 +130,53 @@ export default function ForgotPasswordScreen() {
     reset(currentForm.defaultValues);
   }, [currentStep, reset]);
 
-  const getProgress = () => {
-    switch (currentStep) {
-      case 1:
-        return 33;
-      case 2:
-        return 66;
-      case 3:
-        return 100;
-      default:
-        return 0;
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "Nhập Số Điện Thoại";
-      case 2:
-        return "Nhập Mã Xác Nhận (OTP)";
-      case 3:
-        return "Đặt Mật Khẩu Mới";
-      default:
-        return "";
-    }
-  };
-
   const handleNextStep = async (data: any) => {
     const isValid = await trigger();
-    if (!isValid) {
-      console.log("Validation errors:", errors);
-      return;
-    }
+    if (!isValid) return;
 
     try {
       if (currentStep === 1) {
-        Alert.alert(
-          "Thành công",
-          `Mã OTP đã được gửi tới số điện thoại ${(data as PhoneForm).phone}`
-        );
+        const fullData = { email: data.email };
+        const res = await dispatch(forgotPass(fullData)).unwrap();
+
+        setEmail(data.email);
         setCurrentStep(2);
+        setCountdown(60);
       } else if (currentStep === 2) {
-        if ((data as OtpForm).otp === "123456") {
-          Alert.alert("Thành công", "Mã OTP hợp lệ.");
+        const fullData = {
+          email,
+          token: data.otp,
+        };
+
+        const res = await dispatch(verifyOtp(fullData)).unwrap();
+        const resetTokenFromAPI = res?.data?.resetToken;
+
+        if (resetTokenFromAPI) {
+          setResetToken(resetTokenFromAPI);
           setCurrentStep(3);
         } else {
-          Alert.alert("Lỗi", "Mã OTP không đúng. Vui lòng thử lại.");
+          Alert.alert("Lỗi", "Xác minh OTP thất bại");
         }
       } else if (currentStep === 3) {
-        Alert.alert("Thành công", "Mật khẩu của bạn đã được đặt lại.");
+        const fullData = {
+          email,
+          resetToken,
+          newPassword: data.newPassword,
+          confirmNewPassword: data.confirmPassword,
+        };
+
+        await dispatch(resetPass(fullData)).unwrap();
+        Alert.alert("Thành công", "Mật khẩu đã được đặt lại");
         router.replace("/(auth)/signin");
       }
-    } catch (error: any) {
-      Alert.alert("Lỗi", error.message || "Đã xảy ra lỗi. Vui lòng thử lại.");
+    } catch (err: any) {
+      const message = err?.message || "Đã xảy ra lỗi, vui lòng thử lại.";
+      Alert.alert("Lỗi", message);
     }
   };
+
+  const getProgress = () =>
+    currentStep === 1 ? 33 : currentStep === 2 ? 66 : 100;
 
   return (
     <KeyboardAvoidingView
@@ -161,11 +196,11 @@ export default function ForgotPasswordScreen() {
             className="w-32 h-32 mb-4"
             resizeMode="contain"
           />
-
           <Text className="text-3xl font-bold text-primary mb-8">
             Quên Mật Khẩu
           </Text>
 
+          {/* Progress */}
           <View className="w-full mb-6">
             <View className="h-2 bg-gray-200 rounded-full mb-2">
               <View
@@ -178,56 +213,58 @@ export default function ForgotPasswordScreen() {
             </Text>
           </View>
 
+          {/* Step 1: Email */}
           {currentStep === 1 && (
             <View className="w-full">
               <Text className="text-base text-gray-600 mb-4 text-center">
-                Vui lòng nhập số điện thoại bạn đã đăng ký để nhận mã xác nhận.
+                Vui lòng nhập email để nhận mã xác nhận.
               </Text>
               <Controller
                 control={control}
-                name="phone"
+                name="email"
                 render={({ field: { onChange, value } }) => (
                   <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
-                    <Ionicons
-                      name="call-outline"
-                      size={20}
-                      color="#6b7280"
-                      className="mr-2"
-                    />
+                    <Ionicons name="mail-outline" size={20} color="#6b7280" />
                     <TextInput
-                      placeholder="Số điện thoại"
-                      className="flex-1 text-base text-gray-800"
+                      placeholder="Email"
+                      className="flex-1 ml-2 text-base text-gray-800"
                       placeholderTextColor="#9ca3af"
-                      keyboardType="phone-pad"
+                      keyboardType="email-address"
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
-                      numberOfLines={1}
                     />
                   </View>
                 )}
               />
-              {errors.phone && typeof errors.phone.message === "string" && (
+              {errors.email && (
                 <Text className="text-red-500 text-sm pt-1">
-                  {errors.phone.message}
+                  {errors.email.message?.toString()}
                 </Text>
               )}
               <TouchableOpacity
-                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80"
+                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80 items-center"
                 onPress={handleSubmit(handleNextStep)}
+                disabled={loading}
               >
-                <Text className="text-white text-center font-semibold text-lg">
-                  Gửi mã xác nhận
-                </Text>
+                {loading ? (
+                  <Text className="text-white font-semibold text-lg">
+                    Đang gửi...
+                  </Text>
+                ) : (
+                  <Text className="text-white font-semibold text-lg">
+                    Gửi mã xác nhận
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           )}
 
+          {/* Step 2: OTP */}
           {currentStep === 2 && (
             <View className="w-full">
               <Text className="text-base text-gray-600 mb-4 text-center">
-                Mã xác nhận đã được gửi đến số điện thoại của bạn. Vui lòng kiểm
-                tra tin nhắn.
+                Nhập mã OTP được gửi đến email.
               </Text>
               <Controller
                 control={control}
@@ -247,39 +284,47 @@ export default function ForgotPasswordScreen() {
                   </View>
                 )}
               />
-              {errors.otp && typeof errors.otp.message === "string" && (
+              {errors.otp && (
                 <Text className="text-red-500 text-sm pt-1">
-                  {errors.otp.message}
+                  {errors.otp.message?.toString()}
                 </Text>
               )}
               <TouchableOpacity
-                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80"
+                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80 items-center"
                 onPress={handleSubmit(handleNextStep)}
+                disabled={loading}
               >
-                <Text className="text-white text-center font-semibold text-lg">
-                  Xác nhận
-                </Text>
+                {loading ? (
+                  <Text className="text-white font-semibold text-lg">
+                    Đang xác minh...
+                  </Text>
+                ) : (
+                  <Text className="text-white font-semibold text-lg">
+                    Xác nhận
+                  </Text>
+                )}
               </TouchableOpacity>
-              <TouchableOpacity
-                className="mt-4 p-2"
-                onPress={() =>
-                  Alert.alert(
-                    "Gửi lại OTP",
-                    "Chức năng gửi lại OTP sẽ được triển khai."
-                  )
-                }
-              >
-                <Text className="text-primary text-center font-medium">
-                  Gửi lại mã xác nhận
-                </Text>
-              </TouchableOpacity>
+              <View className="mt-4">
+                {canResend ? (
+                  <TouchableOpacity onPress={handleResendOtp} className="py-2">
+                    <Text className="text-center text-primary font-semibold">
+                      Gửi lại mã xác nhận
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text className="text-center text-gray-500">
+                    Bạn có thể gửi lại mã sau {countdown}s
+                  </Text>
+                )}
+              </View>
             </View>
           )}
 
+          {/* Step 3: New Password */}
           {currentStep === 3 && (
             <View className="w-full">
               <Text className="text-base text-gray-600 mb-4 text-center">
-                Vui lòng đặt mật khẩu mới cho tài khoản của bạn.
+                Nhập mật khẩu mới cho tài khoản của bạn.
               </Text>
               <Controller
                 control={control}
@@ -299,7 +344,6 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
-                      numberOfLines={1}
                     />
                     <TouchableOpacity
                       onPress={() => setShowNewPassword(!showNewPassword)}
@@ -315,13 +359,11 @@ export default function ForgotPasswordScreen() {
                   </View>
                 )}
               />
-              {errors.newPassword &&
-                typeof errors.newPassword.message === "string" && (
-                  <Text className="text-red-500 text-sm pt-1">
-                    {errors.newPassword.message}
-                  </Text>
-                )}
-
+              {errors.newPassword && (
+                <Text className="text-red-500 text-sm pt-1">
+                  {errors.newPassword.message?.toString()}
+                </Text>
+              )}
               <Controller
                 control={control}
                 name="confirmPassword"
@@ -340,7 +382,6 @@ export default function ForgotPasswordScreen() {
                       autoCapitalize="none"
                       value={value}
                       onChangeText={onChange}
-                      numberOfLines={1}
                     />
                     <TouchableOpacity
                       onPress={() =>
@@ -360,22 +401,29 @@ export default function ForgotPasswordScreen() {
                   </View>
                 )}
               />
-              {errors.confirmPassword &&
-                typeof errors.confirmPassword.message === "string" && (
-                  <Text className="text-red-500 text-sm pt-1">
-                    {errors.confirmPassword.message}
+              {errors.confirmPassword && (
+                <Text className="text-red-500 text-sm pt-1">
+                  {errors.confirmPassword.message?.toString()}
+                </Text>
+              )}
+              <TouchableOpacity
+                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80 items-center"
+                onPress={handleSubmit(handleNextStep)}
+                disabled={loading}
+              >
+                {loading ? (
+                  <Text className="text-white font-semibold text-lg">
+                    Đang đặt lại...
+                  </Text>
+                ) : (
+                  <Text className="text-white font-semibold text-lg">
+                    Đặt lại mật khẩu
                   </Text>
                 )}
-              <TouchableOpacity
-                className="bg-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80"
-                onPress={handleSubmit(handleNextStep)}
-              >
-                <Text className="text-white text-center font-semibold text-lg">
-                  Đặt lại mật khẩu
-                </Text>
               </TouchableOpacity>
             </View>
           )}
+
           <Link href={"/(auth)/signin"} asChild>
             <TouchableOpacity className="bg-white border border-primary py-3 rounded-full w-full mt-6 shadow-md active:opacity-80">
               <Text className="text-primary text-center font-semibold text-lg">

@@ -29,3 +29,18 @@ export interface UpdateUser {
   phone: string;
   gender: string;
 }
+export interface forgotPassword {
+  email: string;
+}
+
+export interface verifyOTP {
+  email: string;
+  token: string;
+}
+
+export interface resetPassword {
+  email: string;
+  resetToken: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
