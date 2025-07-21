@@ -15,7 +15,7 @@ export default function StackLayout() {
       }}
     >
       <Stack.Screen
-        name="[id]"
+        name="detail/[id]"
         options={{
           title: "Học sinh",
         }}

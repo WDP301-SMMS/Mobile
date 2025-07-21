@@ -120,7 +120,7 @@ export default function ChildScreen() {
                   Giới tính: {child.gender === "MALE" ? "Nam" : "Nữ"}
                 </Text>
 
-                <Link href={`/(child)/${child._id}`} asChild>
+                <Link href={`/(child)/detail/${child._id}`} asChild>
                   <TouchableOpacity className="mt-4 px-5 py-2 rounded-lg flex-row items-center justify-center bg-primary">
                     <Text className="text-white font-semibold text-base mr-2">
                       Chi tiết

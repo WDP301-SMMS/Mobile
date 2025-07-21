@@ -48,6 +48,7 @@ export default function RootLayout() {
                 name="(notification)"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen name="(chat)" options={{ headerShown: false }} />
               <Stack.Screen
                 name="(health-check)"
                 options={{ headerShown: false }}
@@ -70,7 +71,10 @@ export default function RootLayout() {
               />
               <Stack.Screen name="(consent)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
+              <Stack.Screen
+                name="+not-found"
+                options={{ headerShown: false }}
+              />
             </Stack>
             <StatusBar style="auto" />
           </AuthProvider>

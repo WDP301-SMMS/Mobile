@@ -132,7 +132,7 @@ export default function ConsentScreen() {
                 return (
                   <Pressable
                     key={consent._id}
-                    onPress={() => router.push(`/(consent)/${consent._id}`)}
+                    onPress={() => router.push(`/(consent)/detail/${consent._id}`)}
                     className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md flex-row items-center justify-between active:bg-gray-50"
                   >
                     <View className="flex-1 pr-4">

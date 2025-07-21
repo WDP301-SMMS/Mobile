@@ -59,7 +59,7 @@ export default function ChatScreen() {
           conversations.map((conv) => (
             <Link
               key={conv.id}
-              href={`/(chat)/${conv.id}`}
+              href={`/(chat)/chat-room/${conv.id}`}
               asChild
             >
               <TouchableOpacity

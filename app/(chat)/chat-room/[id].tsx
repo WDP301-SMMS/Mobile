@@ -2,15 +2,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface Message {

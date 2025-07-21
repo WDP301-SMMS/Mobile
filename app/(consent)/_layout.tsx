@@ -26,7 +26,7 @@ export default function StackLayout() {
         }}
       />
       <Stack.Screen
-        name="[id]"
+        name="detail/[id]"
         options={{
           headerStyle: {
             backgroundColor: "#2260FF",

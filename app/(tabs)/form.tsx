@@ -16,7 +16,7 @@ const sections = [
       {
         icon: "medical-services",
         label: "Khám sức khỏe",
-        route: "/(health-check)",
+        route: "/cdl",
         color: "#10B981",
         bg: "bg-green-100",
       },
