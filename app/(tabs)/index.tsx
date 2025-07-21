@@ -4,9 +4,11 @@ import { useNotifications } from "@/libs/context/NotificationContext";
 import { useNotification } from "@/libs/hooks/useNotification";
 import { useAppDispatch } from "@/libs/stores";
 import {
+  getAttentionNotifications,
   registerPushToken,
   unreadCount,
 } from "@/libs/stores/notificationManager/thunk";
+import { getNotificationDisplayData } from "@/libs/utils/notification/displayData";
 import { requestPermissionAndGetToken } from "@/libs/utils/notification/firebaseNotification";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,17 +25,22 @@ export default function HomeScreen() {
     year: "numeric",
   });
   const { user } = useAuth();
-  const { countUnread } = useNotification();
+  const { countUnread, attentionNotifications } = useNotification();
   const { hasNewNotification, hasNewMessage } = useNotifications();
   const dispatch = useAppDispatch();
 
   useFocusEffect(
     useCallback(() => {
-      if (hasNewNotification) {
-        dispatch(unreadCount());
-      }
-    }, [hasNewNotification, dispatch])
+      dispatch(unreadCount());
+      dispatch(getAttentionNotifications());
+    }, [dispatch])
   );
+
+  useEffect(() => {
+    if (hasNewNotification) {
+      dispatch(unreadCount());
+    }
+  }, [hasNewNotification, dispatch]);
 
   useEffect(() => {
     async function setupPushNotifications() {
@@ -117,60 +124,28 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {[
-          {
-            image: require("@/assets/icons/consent.png"),
-            title: "Phiếu Đồng Ý Tiêm Sởi",
-            child: "Nguyễn Văn A",
-            note: "Hạn phản hồi: 10/06/2025",
-            urgency: "urgent",
-          },
-          {
-            image: require("@/assets/icons/schedule.png"),
-            title: "Lịch Hẹn Khám Tổng Quát",
-            child: "Nguyễn Văn B",
-            note: "Ngày 13/06/2025, 09:00 sáng",
-            urgency: "normal",
-          },
-        ].map((item, index) => (
-          <View
-            key={index}
-            className={`flex-row items-center rounded-2xl p-4 mb-4 shadow-md ${
-              item.urgency === "urgent"
-                ? "bg-red-50 border-l-4 border-danger"
-                : "bg-sky-50 border-l-4 border-secondary"
-            }`}
-          >
-            <Image
-              source={item.image}
-              className="w-12 h-12 mr-4"
-              resizeMode="contain"
-            />
-            <View className="flex-1">
-              <Text
-                className={`text-base font-bold mb-1 ${
-                  item.urgency === "urgent" ? "text-danger" : "text-primary"
-                }`}
-              >
-                {item.title}
-              </Text>
-              <Text
-                className={`text-sm mb-0.5 ${
-                  item.urgency === "urgent" ? "text-red-700" : "text-blue-700"
-                }`}
-              >
-                <Text className="font-semibold">Học sinh:</Text> {item.child}
-              </Text>
-              <Text
-                className={`text-xs font-medium ${
-                  item.urgency === "urgent" ? "text-red-600" : "text-blue-600"
-                }`}
-              >
-                {item.note}
-              </Text>
-            </View>
+        {attentionNotifications.length > 0 && (
+          <View className="mt-6">
+            {attentionNotifications.map((noti) => {
+              const display = getNotificationDisplayData(noti);
+              return (
+                <View
+                  key={noti._id}
+                  className="flex-row items-center rounded-2xl p-4 mb-4 bg-sky-50 shadow-sm"
+                >
+                  <View className="flex-1">
+                    <Text className="font-semibold text-gray-900">
+                      {display.title}
+                    </Text>
+                    <Text className="text-gray-600 text-sm">
+                      {display.body}
+                    </Text>
+                  </View>
+                </View>
+              );
+            })}
           </View>
-        ))}
+        )}
 
         <Link href={"/(tabs)/form"} asChild>
           <TouchableOpacity className="mt-2 self-start flex-row items-center p-2 rounded-lg">

@@ -25,6 +25,18 @@ export const getNotifications = createAsyncThunk(
   }
 );
 
+export const getAttentionNotifications = createAsyncThunk(
+  "attentionNotifications",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await manageNotification.getAttentionNotifications();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Có lỗi");
+    }
+  }
+);
+
 export const unreadCount = createAsyncThunk(
   "unreadCount",
   async (_, { rejectWithValue }) => {

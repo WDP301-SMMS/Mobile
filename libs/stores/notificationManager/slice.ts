@@ -1,16 +1,23 @@
 import { Notification } from "@/libs/types/notification";
 import { createSlice } from "@reduxjs/toolkit";
-import { getNotifications, registerPushToken, unreadCount } from "./thunk";
+import {
+  getAttentionNotifications,
+  getNotifications,
+  registerPushToken,
+  unreadCount,
+} from "./thunk";
 
 type stateType = {
   loading: boolean;
   notifications?: Notification[] | [];
+  attentionNotifications: Notification[] | [];
   countUnread: number;
 };
 
 const initialState: stateType = {
   loading: false,
   notifications: [],
+  attentionNotifications: [],
   countUnread: 0,
 };
 
@@ -37,6 +44,16 @@ export const manageNotificationSlice = createSlice({
         state.notifications = action.payload.data;
       })
       .addCase(getNotifications.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getAttentionNotifications.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAttentionNotifications.fulfilled, (state, action) => {
+        state.loading = false;
+        state.attentionNotifications = action.payload.data;
+      })
+      .addCase(getAttentionNotifications.rejected, (state) => {
         state.loading = false;
       })
       .addCase(unreadCount.pending, (state) => {

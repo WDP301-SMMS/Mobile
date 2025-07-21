@@ -1,8 +1,16 @@
-import { UserAvatar } from "@/components/user/UserAvatar";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useMemo, useState } from "react";
+import { useHealthProfile } from "@/libs/hooks/useHealthProfile";
+import { useAppDispatch } from "@/libs/stores";
 import {
+  claimStudent,
+  getMyChild,
+} from "@/libs/stores/healthProfileManager/thunk";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import dayjs from "dayjs";
+import { Link } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
   Alert,
   Modal,
   ScrollView,
@@ -13,64 +21,57 @@ import {
 } from "react-native";
 
 export default function ChildScreen() {
-  const [children, setChildren] = useState([
-    {
-      id: "1",
-      fullName: "Nguyễn Văn A",
-      avatar: "https://i.pravatar.cc/150?img=6",
-      className: "Lớp 3A",
-      schoolYear: "2023-2024",
-      dob: "15/09/2017",
-      gender: "Nam",
-    },
-    {
-      id: "2",
-      fullName: "Trần Thị B",
-      avatar: "https://i.pravatar.cc/150?img=10",
-      className: "Lớp 5C",
-      schoolYear: "2022-2023",
-      dob: "20/03/2015",
-      gender: "Nữ",
-    },
-    {
-      id: "3",
-      fullName: "Lê Minh C",
-      avatar: "https://i.pravatar.cc/150?img=11",
-      className: "Lớp 1B",
-      schoolYear: "2024-2025",
-      dob: "01/11/2019",
-      gender: "Nam",
-    },
-    {
-      id: "4",
-      fullName: "Phạm Thị D",
-      avatar: "https://i.pravatar.cc/150?img=12",
-      className: "Lớp 3A",
-      schoolYear: "2023-2024",
-      dob: "05/07/2017",
-      gender: "Nữ",
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { myChild, loading } = useHealthProfile();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
 
-  const filteredChildren = useMemo(() => {
-    return children.filter((child) =>
-      child.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [children, searchQuery]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getMyChild());
+    }, [dispatch])
+  );
 
-  const handleAddChild = () => {
-    if (inviteCode === "HS0001") {
-      setInviteCode("");
-      setModalVisible(false);
-      Alert.alert("Thành công", "Đã thêm hồ sơ bé thành công!");
-    } else {
-      Alert.alert("Mã không hợp lệ", "Vui lòng nhập đúng mã mời.");
+  const filteredChildren = useMemo(() => {
+    return myChild.filter((child) =>
+      child.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [myChild, searchQuery]);
+
+  const handleAddChild = async () => {
+    if (inviteCode.trim() === "") {
+      Alert.alert("Lỗi", "Vui lòng nhập mã mời.");
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(claimStudent(inviteCode));
+      if (claimStudent.fulfilled.match(resultAction)) {
+        await dispatch(getMyChild());
+        setModalVisible(false);
+        setInviteCode("");
+        Alert.alert("Thành công", "Đã thêm hồ sơ bé thành công.");
+      } else {
+        Alert.alert(
+          "Thất bại",
+          "Không thể thêm hồ sơ. Vui lòng kiểm tra lại mã mời."
+        );
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Đã xảy ra lỗi khi thêm hồ sơ.");
     }
   };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#3B82F6" />
+        <Text className="mt-3 text-gray-600">Đang tải hồ sơ bé...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -84,7 +85,6 @@ export default function ChildScreen() {
               placeholderTextColor="#888"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              numberOfLines={1}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity
@@ -101,54 +101,37 @@ export default function ChildScreen() {
           {filteredChildren.length > 0 ? (
             filteredChildren.map((child) => (
               <View
-                key={child.id}
+                key={child._id}
                 className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-tertiary"
               >
-                <View className="flex-row items-center mb-4">
-                  <UserAvatar
-                    username={child.fullName ?? ""}
-                    size={80}
-                    fontSize={22}
-                  />
-                  <View className="flex-1 ml-4">
-                    <Text className="text-xl font-bold text-primary mb-1">
-                      {child.fullName}
-                    </Text>
-                    <Text className="text-base text-gray-700">
-                      {child.className}
-                    </Text>
-                    <Text className="text-sm text-gray-500 mt-0.5">
-                      Niên khóa: {child.schoolYear}
-                    </Text>
-                  </View>
-                </View>
+                <Text className="text-xl font-bold text-primary mb-2">
+                  {child.fullName}
+                </Text>
 
-                <View className="border-t border-gray-100 pt-3 mt-3">
-                  <View className="flex-row items-center mb-1">
-                    <MaterialIcons name="cake" size={18} color="#6B7280" />
-                    <Text className="text-gray-600 ml-2">
-                      Ngày sinh: {child.dob}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <MaterialIcons name="wc" size={18} color="#6B7280" />
-                    <Text className="text-gray-600 ml-2">
-                      Giới tính: {child.gender}
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity className="mt-4 px-5 py-2 rounded-lg flex-row items-center justify-center bg-primary">
-                  <Link href={`/(child)/${child.id}`} asChild>
+                <Text className="text-gray-700 text-base mb-1">
+                  Lớp: {child.classId?.className}
+                </Text>
+
+                <Text className="text-gray-700 text-base mb-1">
+                  Ngày sinh: {dayjs(child.dateOfBirth).format("DD/MM/YYYY")}
+                </Text>
+
+                <Text className="text-gray-700 text-base mb-1">
+                  Giới tính: {child.gender === "MALE" ? "Nam" : "Nữ"}
+                </Text>
+
+                <Link href={`/(child)/${child._id}`} asChild>
+                  <TouchableOpacity className="mt-4 px-5 py-2 rounded-lg flex-row items-center justify-center bg-primary">
                     <Text className="text-white font-semibold text-base mr-2">
                       Chi tiết
                     </Text>
-                  </Link>
-                  <MaterialIcons
-                    name="arrow-right-alt"
-                    size={20}
-                    color="white"
-                  />
-                </TouchableOpacity>
+                    <MaterialIcons
+                      name="arrow-right-alt"
+                      size={20}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                </Link>
               </View>
             ))
           ) : (
@@ -174,7 +157,6 @@ export default function ChildScreen() {
         </View>
       </ScrollView>
 
-      {/* Modal nhập mã mời */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -191,7 +173,6 @@ export default function ChildScreen() {
               className="border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-800 mb-4"
               value={inviteCode}
               onChangeText={setInviteCode}
-              numberOfLines={1}
             />
             <View className="flex-row justify-end">
               <TouchableOpacity
