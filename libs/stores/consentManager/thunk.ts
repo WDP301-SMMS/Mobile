@@ -57,9 +57,6 @@ export const updateConsentStatus = createAsyncThunk(
         ...(reasonForDeclining && { reasonForDeclining }),
       };
 
-      console.log("Request:", req);
-      console.log("Body:", body);
-
       const response = await manageConsent.updateConsentStatus(req, body);
       return response.data;
     } catch (error: any) {

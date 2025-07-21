@@ -69,7 +69,14 @@ export default function RootLayout() {
                 name="(incident)"
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="(consent)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(vaccination-consent)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(healthCheck-consent)"
+                options={{ headerShown: false }}
+              />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen
                 name="+not-found"

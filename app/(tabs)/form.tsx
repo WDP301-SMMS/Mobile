@@ -16,7 +16,7 @@ const sections = [
       {
         icon: "medical-services",
         label: "Khám sức khỏe",
-        route: "/cdl",
+        route: "/(health-check)",
         color: "#10B981",
         bg: "bg-green-100",
       },
@@ -61,11 +61,18 @@ const sections = [
         bg: "bg-pink-100",
       },
       {
-        icon: "description",
-        label: "Các đơn chấp thuận",
-        route: "/(consent)",
-        color: "#2563EB",
+        icon: "check-circle",
+        label: "Đơn tiêm chủng",
+        route: "/(vaccination-consent)",
+        color: "#3B82F6",
         bg: "bg-blue-100",
+      },
+      {
+        icon: "fact-check",
+        label: "Đơn khám sức khỏe",
+        route: "/(healthCheck-consent)",
+        color: "#14B8A6",
+        bg: "bg-teal-100",
       },
     ],
   },
@@ -77,7 +84,10 @@ export default function FormScreen() {
   const cardWidth = (screenWidth - 48) / 2;
 
   return (
-    <ScrollView className="flex-1 bg-white pt-6">
+    <ScrollView
+      className="flex-1 bg-white pt-6"
+      contentContainerStyle={{ paddingBottom: 80 }}
+    >
       {sections.map((section, sIndex) => (
         <View key={sIndex} className="mb-6 px-4">
           <View className="flex-row items-center justify-center mb-3">

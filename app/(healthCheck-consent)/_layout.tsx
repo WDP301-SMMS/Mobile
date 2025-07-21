@@ -21,7 +21,7 @@ export default function StackLayout() {
           },
           headerTintColor: "#fff",
           headerShown: true,
-          headerTitle: "Các đơn chấp thuận",
+          headerTitle: "Đơn khám sức khỏe",
           headerTitleAlign: "center",
         }}
       />
