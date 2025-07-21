@@ -52,7 +52,7 @@ export default function ConsentScreen() {
           bgColorClass: "bg-yellow-100",
           iconColorHex: "rgb(161, 98, 7)",
           iconName: "hourglass-empty",
-          label: "Đang chờ duyệt",
+          label: "Chờ chấp thuận",
         };
     }
   };
@@ -67,7 +67,7 @@ export default function ConsentScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="px-4"
+            contentContainerStyle={{ paddingRight: 16, paddingLeft: 16 }}
           >
             {consents.map((item) => {
               const isSelected = item.studentId === selectedStudentId;

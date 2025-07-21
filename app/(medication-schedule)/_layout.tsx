@@ -21,19 +21,7 @@ export default function StackLayout() {
           },
           headerTintColor: "#fff",
           headerShown: true,
-          headerTitle: "Các đơn chấp thuận",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          headerStyle: {
-            backgroundColor: "#2260FF",
-          },
-          headerTintColor: "#fff",
-          headerShown: true,
-          headerTitle: "Chi tiết đơn",
+          headerTitle: "Lịch uống thuốc",
           headerTitleAlign: "center",
         }}
       />

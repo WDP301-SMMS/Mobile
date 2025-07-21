@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function HealthProfileScreen() {
+export default function MedicalResultScreen() {
   return (
     <View>
-      <Text>Health Profile</Text>
+      <Text>Health check</Text>
     </View>
   );
 }

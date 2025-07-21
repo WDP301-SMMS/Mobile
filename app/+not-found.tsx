@@ -1,32 +1,35 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { Link, Stack } from "expo-router";
+import { Image } from "react-native";
 
 export default function NotFoundScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen does not exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
+      <Stack.Screen options={{ title: "Oops!" }} />
+      <ThemedView className="flex-1 items-center justify-center bg-white px-6">
+        <Image
+          source={{
+            uri: "https://i.gifer.com/7efs.gif",
+          }}
+          className="w-64 h-48 mb-6"
+          resizeMode="contain"
+        />
+        <ThemedText type="title" className="text-xl font-bold text-center mb-2">
+          Trang không tồn tại!
+        </ThemedText>
+        <ThemedText
+          type="default"
+          className="text-base text-gray-500 text-center mb-6"
+        >
+          Có vẻ như bạn đang tìm một trang không tồn tại hoặc đã bị xóa.
+        </ThemedText>
+        <Link href="/" className="bg-blue-600 px-6 py-3 rounded-lg">
+          <ThemedText type="link" className="text-white font-semibold text-base">
+            Quay về Trang chủ
+          </ThemedText>
         </Link>
       </ThemedView>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});

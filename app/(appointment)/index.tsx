@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function MedicalResultScreen() {
+export default function AppointmentScreen() {
   return (
     <View>
-      <Text>Medical Result</Text>
+      <Text>Appointment</Text>
     </View>
   );
 }

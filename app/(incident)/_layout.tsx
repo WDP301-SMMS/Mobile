@@ -21,7 +21,7 @@ export default function StackLayout() {
           },
           headerTintColor: "#fff",
           headerShown: true,
-          headerTitle: "Hồ sơ sức khỏe",
+          headerTitle: "Sự cố y tế",
           headerTitleAlign: "center",
         }}
       />

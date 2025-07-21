@@ -196,7 +196,7 @@ export default function ConsentDetailScreen() {
                     ? "Đồng ý"
                     : consent.status === "DECLINED"
                     ? "Từ chối"
-                    : "Chờ duyệt"}
+                    : "Chờ chấp thuận"}
                 </Text>
               </View>
 
@@ -235,7 +235,7 @@ export default function ConsentDetailScreen() {
                   <TouchableOpacity
                     onPress={handleApprove}
                     className={`flex-1 items-center justify-center py-3 px-6 rounded-lg ${
-                      loading ? "bg-green-300" : "bg-green-600"
+                      loading ? "bg-primary/50" : "bg-primary"
                     }`}
                     disabled={loading}
                   >

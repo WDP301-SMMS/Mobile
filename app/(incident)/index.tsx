@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function ScheduleScreen() {
+export default function IncidentScreen() {
   return (
     <View>
-      <Text>Schedule</Text>
+      <Text>Incident</Text>
     </View>
   );
 }

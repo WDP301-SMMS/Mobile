@@ -43,28 +43,32 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(child)" options={{ headerShown: false }} />
-              <Stack.Screen name="(consent)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="(medical-results)"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="(schedule)"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="(vaccination-history)"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="(health-profile)"
-                options={{ headerShown: false }}
-              />
               <Stack.Screen name="(profile)" options={{ headerShown: false }} />
               <Stack.Screen
                 name="(notification)"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="(health-check)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(vaccination)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(medication-schedule)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(appointment)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(incident)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(consent)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>

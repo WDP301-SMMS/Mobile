@@ -21,7 +21,7 @@ export default function StackLayout() {
           },
           headerTintColor: "#fff",
           headerShown: true,
-          headerTitle: "Lịch sử tiêm",
+          headerTitle: "Tiêm chủng",
           headerTitleAlign: "center",
         }}
       />
