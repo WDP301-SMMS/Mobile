@@ -1,5 +1,5 @@
 import { manageUser } from "@/libs/services/manageUser";
-import { UpdateUser } from "@/libs/types/account";
+import { ChangePassword, UpdateUser } from "@/libs/types/account";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getUser = createAsyncThunk(
@@ -19,6 +19,18 @@ export const updateUser = createAsyncThunk(
   async (req: UpdateUser, { rejectWithValue }) => {
     try {
       const response = await manageUser.updateUser(req);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Có lỗi");
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  "changePassword/me",
+  async (req: ChangePassword, { rejectWithValue }) => {
+    try {
+      const response = await manageUser.changePassword(req);
       return response.data;
     } catch (error) {
       return rejectWithValue("Có lỗi");

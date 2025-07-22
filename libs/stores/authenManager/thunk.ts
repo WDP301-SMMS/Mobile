@@ -30,7 +30,7 @@ export const login = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      console.log(error);
+      console.log(error).response.data;
       return rejectWithValue("Email hoặc mật khẩu không đúng.");
     }
   }
