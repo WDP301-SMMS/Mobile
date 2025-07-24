@@ -13,7 +13,7 @@ export interface Consent {
   campaignId: Campaign;
   studentId: string;
   parentId: string;
-  status: "APPROVED" | "DECLINED" | "PENDING";
+  status: string;
   reasonForDeclining?: string;
   confirmedAt: string;
   createdAt: string;

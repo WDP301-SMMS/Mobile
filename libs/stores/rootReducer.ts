@@ -3,6 +3,7 @@ import { manageAuthenReducer } from "./authenManager/slice";
 import { manageConsentReducer } from "./consentManager/slice";
 import { manageHealthCheckReducer } from "./healthCheckManager/slice";
 import { manageHealthProfileReducer } from "./healthProfileManager/slice";
+import { manageIncidentReducer } from "./incidentManager/slice";
 import { manageNotificationReducer } from "./notificationManager/slice";
 import { manageUserReducer } from "./userManager/slice";
 
@@ -13,4 +14,5 @@ export const rootReducer = combineReducers({
   manageNotification: manageNotificationReducer,
   manageHealthProfile: manageHealthProfileReducer,
   manageHealthCheck: manageHealthCheckReducer,
+  manageIncident: manageIncidentReducer,
 });

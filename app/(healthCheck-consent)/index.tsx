@@ -1,10 +1,19 @@
 import { useHealthCheck } from "@/libs/hooks/useHealthCheck";
+import { useHealthProfile } from "@/libs/hooks/useHealthProfile";
 import { useAppDispatch } from "@/libs/stores";
 import { getHealthCheckConsent } from "@/libs/stores/healthCheckManager/thunk";
+import { getMyChild } from "@/libs/stores/healthProfileManager/thunk";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 const statusFilters = [
   { value: "ALL", label: "Tất cả" },
@@ -17,93 +26,103 @@ const statusFilters = [
   { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
 ];
 
+const statusMap: Record<
+  string,
+  {
+    label: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
+    textColor: string;
+    bgColor: string;
+    iconColor: string;
+  }
+> = {
+  APPROVED: {
+    label: "Đồng ý",
+    icon: "check-circle",
+    textColor: "text-green-700",
+    bgColor: "bg-green-100",
+    iconColor: "rgb(21, 128, 61)",
+  },
+  DECLINED: {
+    label: "Từ chối",
+    icon: "cancel",
+    textColor: "text-red-700",
+    bgColor: "bg-red-100",
+    iconColor: "rgb(185, 28, 28)",
+  },
+  COMPLETED: {
+    label: "Đã hoàn tất",
+    icon: "task-alt",
+    textColor: "text-blue-800",
+    bgColor: "bg-blue-100",
+    iconColor: "rgb(30, 64, 175)",
+  },
+  REVOKED: {
+    label: "Đã thu hồi",
+    icon: "block",
+    textColor: "text-gray-700",
+    bgColor: "bg-gray-100",
+    iconColor: "rgb(75, 85, 99)",
+  },
+  UNDER_OBSERVATION: {
+    label: "Đang theo dõi",
+    icon: "visibility",
+    textColor: "text-yellow-700",
+    bgColor: "bg-yellow-100",
+    iconColor: "rgb(202, 138, 4)",
+  },
+  ADVERSE_REACTION: {
+    label: "Phản ứng phụ",
+    icon: "warning",
+    textColor: "text-pink-700",
+    bgColor: "bg-pink-100",
+    iconColor: "rgb(190, 24, 93)",
+  },
+  PENDING: {
+    label: "Chờ chấp thuận",
+    icon: "hourglass-empty",
+    textColor: "text-yellow-700",
+    bgColor: "bg-yellow-100",
+    iconColor: "rgb(161, 98, 7)",
+  },
+};
+
 export default function ConsentScreen() {
   const dispatch = useAppDispatch();
-  const { consents } = useHealthCheck();
+  const { consents, loading } = useHealthCheck();
+  const { myChild } = useHealthProfile();
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
   );
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
 
-  useEffect(() => {
-    dispatch(getHealthCheckConsent());
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getHealthCheckConsent());
+      dispatch(getMyChild());
+    }, [dispatch])
+  );
 
   useEffect(() => {
-    if (consents && consents.length > 0 && !selectedStudentId) {
+    if (consents?.length && !selectedStudentId) {
       setSelectedStudentId(consents[0].studentId._id);
     }
   }, [consents]);
 
-  const filteredConsentsByStudent = consents?.filter(
-    (consent) => consent.studentId._id === selectedStudentId
+  const filtered = consents?.filter(
+    (c) =>
+      c.studentId._id === selectedStudentId &&
+      (selectedStatus === "ALL" || c.status === selectedStatus)
   );
 
-  const filteredConsents = filteredConsentsByStudent?.filter((c) =>
-    selectedStatus === "ALL" ? true : c.status === selectedStatus
-  );
-
-  const getStatusInfo = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-        return {
-          textColorClass: "text-green-700",
-          bgColorClass: "bg-green-100",
-          iconColorHex: "rgb(21, 128, 61)",
-          iconName: "check-circle",
-          label: "Đồng ý",
-        };
-      case "DECLINED":
-        return {
-          textColorClass: "text-red-700",
-          bgColorClass: "bg-red-100",
-          iconColorHex: "rgb(185, 28, 28)",
-          iconName: "cancel",
-          label: "Từ chối",
-        };
-      case "COMPLETED":
-        return {
-          textColorClass: "text-blue-800",
-          bgColorClass: "bg-blue-100",
-          iconColorHex: "rgb(30, 64, 175)",
-          iconName: "task-alt",
-          label: "Đã hoàn tất",
-        };
-      case "REVOKED":
-        return {
-          textColorClass: "text-gray-700",
-          bgColorClass: "bg-gray-100",
-          iconColorHex: "rgb(75, 85, 99)",
-          iconName: "block",
-          label: "Đã thu hồi",
-        };
-      case "UNDER_OBSERVATION":
-        return {
-          textColorClass: "text-yellow-700",
-          bgColorClass: "bg-yellow-100",
-          iconColorHex: "rgb(202, 138, 4)",
-          iconName: "visibility",
-          label: "Đang theo dõi",
-        };
-      case "ADVERSE_REACTION":
-        return {
-          textColorClass: "text-pink-700",
-          bgColorClass: "bg-pink-100",
-          iconColorHex: "rgb(190, 24, 93)",
-          iconName: "warning",
-          label: "Phản ứng phụ",
-        };
-      case "PENDING":
-      default:
-        return {
-          textColorClass: "text-yellow-700",
-          bgColorClass: "bg-yellow-100",
-          iconColorHex: "rgb(161, 98, 7)",
-          iconName: "hourglass-empty",
-          label: "Chờ chấp thuận",
-        };
-    }
-  };
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text className="mt-3 text-gray-600">Đang tải dữ liệu...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-gray-100">
@@ -117,12 +136,12 @@ export default function ConsentScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingRight: 16, paddingLeft: 16 }}
         >
-          {consents?.map((item) => {
-            const isSelected = item.studentId._id === selectedStudentId;
+          {myChild.map((child) => {
+            const isSelected = child._id === selectedStudentId;
             return (
               <Pressable
-                key={item.studentId._id}
-                onPress={() => setSelectedStudentId(item.studentId._id)}
+                key={child._id}
+                onPress={() => setSelectedStudentId(child._id)}
                 className={`flex-row items-center px-4 py-2 mr-3 rounded-full border ${
                   isSelected
                     ? "border-blue-600 bg-blue-50"
@@ -139,7 +158,7 @@ export default function ConsentScreen() {
                     isSelected ? "text-blue-700" : "text-gray-700"
                   }`}
                 >
-                  {item.studentId.fullName}
+                  {child.fullName}
                 </Text>
               </Pressable>
             );
@@ -184,15 +203,15 @@ export default function ConsentScreen() {
 
       {/* Danh sách đơn */}
       <ScrollView className="px-4">
-        {filteredConsents && filteredConsents.length > 0 ? (
-          filteredConsents.map((consent) => {
-            const {
-              iconColorHex,
-              iconName,
-              label,
-              bgColorClass,
-              textColorClass,
-            } = getStatusInfo(consent.status);
+        {filtered?.length ? (
+          filtered.map((consent) => {
+            const s = statusMap[consent.status] || {
+              label: consent.status,
+              icon: "help-outline",
+              textColor: "text-gray-700",
+              bgColor: "bg-gray-100",
+              iconColor: "gray",
+            };
 
             return (
               <Pressable
@@ -210,17 +229,17 @@ export default function ConsentScreen() {
                     {consent.campaignId.schoolYear}
                   </Text>
                   <View
-                    className={`px-3 py-1 rounded-full ${bgColorClass} flex-row items-center w-fit`}
+                    className={`px-3 py-1 rounded-full ${s.bgColor} flex-row items-center w-fit`}
                   >
                     <MaterialIcons
-                      name={iconName as any}
+                      name={s.icon as any}
                       size={16}
-                      color={iconColorHex}
+                      color={s.iconColor}
                     />
                     <Text
-                      className={`ml-1 text-sm font-semibold ${textColorClass}`}
+                      className={`ml-1 text-sm font-semibold ${s.textColor}`}
                     >
-                      {label}
+                      {s.label}
                     </Text>
                   </View>
 
@@ -243,7 +262,7 @@ export default function ConsentScreen() {
                 <MaterialIcons
                   name="chevron-right"
                   size={24}
-                  color={"rgb(107, 114, 128)"}
+                  color="rgb(107, 114, 128)"
                 />
               </Pressable>
             );
@@ -253,7 +272,7 @@ export default function ConsentScreen() {
             <MaterialIcons
               name="sentiment-neutral"
               size={48}
-              color={"rgb(107, 114, 128)"}
+              color="rgb(107, 114, 128)"
             />
             <Text className="text-base italic text-gray-500 mt-3 text-center">
               Không có đơn phù hợp với bộ lọc hiện tại.

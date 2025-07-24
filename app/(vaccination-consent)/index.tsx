@@ -1,10 +1,20 @@
 import { useConsent } from "@/libs/hooks/useConsent";
+import { useHealthProfile } from "@/libs/hooks/useHealthProfile";
 import { useAppDispatch } from "@/libs/stores";
 import { getConsent } from "@/libs/stores/consentManager/thunk";
+import { getMyChild } from "@/libs/stores/healthProfileManager/thunk";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 const statusFilters = [
   { value: "ALL", label: "Tất cả" },
@@ -13,30 +23,46 @@ const statusFilters = [
   { value: "DECLINED", label: "Từ chối" },
   { value: "COMPLETED", label: "Đã hoàn tất" },
   { value: "REVOKED", label: "Đã thu hồi" },
-  { value: "UNDER_OBSERVATION", label: "Theo dõi thêm" },
-  { value: "ADVERSE_REACTION", label: "Phản ứng bất lợi" },
+  { value: "UNDER_OBSERVATION", label: "Đang theo dõi" },
+  { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
 ];
 
 export default function ConsentScreen() {
   const dispatch = useAppDispatch();
-  const { consents } = useConsent();
+  const { consents, loading } = useConsent(); // StudentConsentInfo[]
+  const { myChild } = useHealthProfile(); // { _id, fullName }[]
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
   );
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Promise.all([dispatch(getConsent()), dispatch(getMyChild())]).finally(() =>
+      setRefreshing(false)
+    );
+  }, [dispatch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getConsent());
+      dispatch(getMyChild());
+    }, [dispatch])
+  );
 
   useEffect(() => {
-    dispatch(getConsent());
-  }, []);
-
-  useEffect(() => {
-    if (consents && consents.length > 0 && selectedStudentId === null) {
-      setSelectedStudentId(consents[0].studentId);
+    if (myChild && myChild.length > 0 && selectedStudentId === null) {
+      setSelectedStudentId(myChild[0]._id);
     }
-  }, [consents]);
+  }, [myChild]);
 
-  const selectedStudent = consents?.find(
-    (student) => student.studentId === selectedStudentId
+  const selectedConsentGroup = consents.find(
+    (group) => group.studentId === selectedStudentId
+  );
+
+  const filteredConsents = selectedConsentGroup?.consents.filter(
+    (consent) => selectedStatus === "ALL" || consent.status === selectedStatus
   );
 
   const getStatusInfo = (status: string) => {
@@ -101,28 +127,34 @@ export default function ConsentScreen() {
     }
   };
 
-  const filteredConsents = selectedStudent?.consents.filter((c) =>
-    selectedStatus === "ALL" ? true : c.status === selectedStatus
-  );
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text className="mt-3 text-gray-600">Đang tải dữ liệu...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-gray-100">
+      {/* Chọn học sinh */}
       <View className="pt-3 pb-2 mb-3">
         <Text className="text-base font-semibold text-gray-700 px-4 mb-2">
           Chọn học sinh:
         </Text>
-        {consents && consents.length > 0 ? (
+        {myChild && myChild.length > 0 ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingRight: 16, paddingLeft: 16 }}
           >
-            {consents.map((item) => {
-              const isSelected = item.studentId === selectedStudentId;
+            {myChild.map((item) => {
+              const isSelected = item._id === selectedStudentId;
               return (
                 <Pressable
-                  key={item.studentId}
-                  onPress={() => setSelectedStudentId(item.studentId)}
+                  key={item._id}
+                  onPress={() => setSelectedStudentId(item._id)}
                   className={`flex-row items-center px-4 py-2 mr-3 rounded-full border ${
                     isSelected
                       ? "border-blue-600 bg-blue-50"
@@ -139,7 +171,7 @@ export default function ConsentScreen() {
                       isSelected ? "text-blue-700" : "text-gray-700"
                     }`}
                   >
-                    {item.studentName}
+                    {item.fullName}
                   </Text>
                 </Pressable>
               );
@@ -154,11 +186,12 @@ export default function ConsentScreen() {
         )}
       </View>
 
+      {/* Chọn trạng thái */}
       <View className="pt-3 pb-2 mb-3">
         <Text className="text-base font-semibold text-gray-700 px-4 mb-2">
           Chọn trạng thái:
         </Text>
-        {selectedStudent && (
+        {selectedStudentId && (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -190,11 +223,19 @@ export default function ConsentScreen() {
         )}
       </View>
 
-      <ScrollView className="flex-1 px-4 py-4">
-        {selectedStudent ? (
+      {/* Danh sách đơn */}
+      <ScrollView
+        className="flex-1 px-4 py-4"
+        contentContainerStyle={{ paddingBottom: 20 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {selectedStudentId ? (
           <>
             <Text className="text-xl font-bold text-blue-800 mb-5">
-              Đơn đồng ý của {selectedStudent.studentName}
+              Đơn đồng ý của{" "}
+              {myChild.find((s) => s._id === selectedStudentId)?.fullName}
             </Text>
 
             {filteredConsents && filteredConsents.length > 0 ? (
@@ -206,6 +247,7 @@ export default function ConsentScreen() {
                   iconColorHex,
                   label,
                 } = getStatusInfo(consent.status);
+
                 return (
                   <Pressable
                     key={consent._id}
