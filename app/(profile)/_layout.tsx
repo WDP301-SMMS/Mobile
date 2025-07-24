@@ -43,6 +43,12 @@ export default function StackLayout() {
           title: "Thông tin cá nhân",
         }}
       />
+      <Stack.Screen
+        name="changePassword"
+        options={{
+          title: "Thay đổi mật khẩu",
+        }}
+      />
     </Stack>
   );
 }

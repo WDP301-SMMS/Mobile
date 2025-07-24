@@ -1,7 +1,7 @@
 import notifee from "@notifee/react-native";
 import {
-    getMessaging,
-    setBackgroundMessageHandler,
+  getMessaging,
+  setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
 
 const messaging = getMessaging();
@@ -23,6 +23,7 @@ setBackgroundMessageHandler(messaging, async (remoteMessage) => {
     android: {
       channelId: "default",
       smallIcon: "ic_launcher",
+      sound: "default",
     },
   });
 });

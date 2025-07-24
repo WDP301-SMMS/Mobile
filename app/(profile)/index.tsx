@@ -1,10 +1,12 @@
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/libs/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
-import { ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function ProfileScreen() {
   const { user } = useAuth();
+  const router = useRouter();
 
   const formatDate = (isoDate?: string) => {
     if (!isoDate) return "";
@@ -49,6 +51,15 @@ export default function ProfileScreen() {
             value={getGenderLabel(user.gender)}
           />
         ) : null}
+
+        <TouchableOpacity
+          className="mt-2 mb-4 bg-blue-600 rounded-lg py-3 px-4"
+          onPress={() => router.push("/(profile)/changePassword")}
+        >
+          <Text className="text-white text-center font-semibold">
+            Thay đổi mật khẩu
+          </Text>
+        </TouchableOpacity>
 
         <View className="my-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <Text className="text-base font-semibold text-blue-700 mb-2">

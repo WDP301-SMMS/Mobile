@@ -53,6 +53,7 @@ export function listenToForegroundMessages() {
         android: {
           channelId: "default",
           smallIcon: "ic_launcher",
+          sound: "default",
           importance: AndroidImportance.HIGH,
         },
       });

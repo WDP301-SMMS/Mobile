@@ -5,5 +5,6 @@ export async function createNotificationChannel() {
     id: "default",
     name: "Default Channel",
     importance: AndroidImportance.HIGH,
+    sound: "default",
   });
 }
