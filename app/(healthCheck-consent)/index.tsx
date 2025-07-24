@@ -11,8 +11,7 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  Text,
-  View,
+  Text, TouchableOpacity, View
 } from "react-native";
 
 const statusFilters = [
@@ -139,7 +138,7 @@ export default function ConsentScreen() {
           {myChild.map((child) => {
             const isSelected = child._id === selectedStudentId;
             return (
-              <Pressable
+              <TouchableOpacity
                 key={child._id}
                 onPress={() => setSelectedStudentId(child._id)}
                 className={`flex-row items-center px-4 py-2 mr-3 rounded-full border ${
@@ -160,7 +159,7 @@ export default function ConsentScreen() {
                 >
                   {child.fullName}
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>

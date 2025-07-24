@@ -16,6 +16,7 @@ import {
   RefreshControl,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -319,7 +320,7 @@ export default function MedicationScheduleScreen() {
             {hasRequests ? (
               <>
                 {requests.map((req) => (
-                  <Pressable
+                  <TouchableOpacity
                     key={req._id}
                     className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md"
                     onPress={() =>
@@ -352,7 +353,7 @@ export default function MedicationScheduleScreen() {
                         color="rgb(107, 114, 128)"
                       />
                     </View>
-                  </Pressable>
+                  </TouchableOpacity>
                 ))}
 
                 {loadingMore && (
