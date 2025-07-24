@@ -13,6 +13,7 @@ import {
   RefreshControl,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -249,7 +250,7 @@ export default function ConsentScreen() {
                 } = getStatusInfo(consent.status);
 
                 return (
-                  <Pressable
+                  <TouchableOpacity
                     key={consent._id}
                     onPress={() =>
                       router.push(
@@ -308,7 +309,7 @@ export default function ConsentScreen() {
                       size={24}
                       color={"rgb(107, 114, 128)"}
                     />
-                  </Pressable>
+                  </TouchableOpacity>
                 );
               })
             ) : (

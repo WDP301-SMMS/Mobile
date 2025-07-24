@@ -4,7 +4,7 @@ import { getAllIncident, getIncidentDetail } from "./thunk";
 
 type stateType = {
   loading: boolean;
-  incidents: MedicalIncident[];
+  incidents: MedicalIncident[] | [];
   incidentDetail: MedicalIncident | null;
   page: number;
   hasMore: boolean;

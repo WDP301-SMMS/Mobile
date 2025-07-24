@@ -15,9 +15,17 @@ export function getNotificationDisplayData(notification: {
 
   switch (type) {
     // === Phụ huynh ===
+    case "VACCINATION_RECORD_CREATED":
+      title = "Hồ sơ tiêm chủng mới";
+      body =
+        "Con của bạn vừa được cập nhật hồ sơ tiêm chủng. Vui lòng kiểm tra để biết thêm chi tiết.";
+      link = `/vaccinations/${entityId}`;
+      break;
+
     case "HEALTH_CHECK_CAMPAIGN_NEW":
       title = "Chiến dịch Khám sức khỏe";
-      body = "Nhà trường đã gửi lời mời tham gia một chiến dịch khám sức khỏe mới.";
+      body =
+        "Nhà trường đã gửi lời mời tham gia một chiến dịch khám sức khỏe mới.";
       link = `/health-checks/campaigns/${entityId}`;
       break;
 
@@ -29,7 +37,8 @@ export function getNotificationDisplayData(notification: {
 
     case "VACCINE_CAMPAIGN_NEW":
       title = "Chiến dịch Tiêm chủng";
-      body = "Nhà trường đã gửi lời mời tham gia một chiến dịch tiêm chủng mới.";
+      body =
+        "Nhà trường đã gửi lời mời tham gia một chiến dịch tiêm chủng mới.";
       link = `/vaccinations/campaigns/${entityId}`;
       break;
 
@@ -71,7 +80,8 @@ export function getNotificationDisplayData(notification: {
 
     case "MEDICAL_INCIDENT_PARENT_ALERT":
       title = "Khẩn cấp: Sự cố y tế";
-      body = "Con của bạn gặp sự cố y tế nghiêm trọng. Vui lòng kiểm tra ngay thông tin chi tiết.";
+      body =
+        "Con của bạn gặp sự cố y tế nghiêm trọng. Vui lòng kiểm tra ngay thông tin chi tiết.";
       link = `/meetings/${entityId}`;
       break;
 

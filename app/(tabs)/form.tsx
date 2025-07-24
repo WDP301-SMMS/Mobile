@@ -36,7 +36,7 @@ const sections = [
       {
         icon: "event-available",
         label: "Lịch uống thuốc",
-        route: "/(medication-schedule)",
+        route: "/(medication-request)",
         color: "#F59E0B",
         bg: "bg-yellow-100",
       },

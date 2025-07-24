@@ -25,6 +25,18 @@ export default function StackLayout() {
           headerTitleAlign: "center",
         }}
       />
+      <Stack.Screen
+        name="schedule/[id]"
+        options={{
+          headerStyle: {
+            backgroundColor: "#2260FF",
+          },
+          headerTintColor: "#fff",
+          headerShown: true,
+          headerTitle: "Chi tiết lịch",
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 }

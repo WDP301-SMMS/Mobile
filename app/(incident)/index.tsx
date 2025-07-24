@@ -15,8 +15,7 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  Text,
-  View,
+  Text, TouchableOpacity, View
 } from "react-native";
 
 const severityFilters = [
@@ -243,7 +242,7 @@ export default function IncidentScreen() {
                       ?.label || incident.severity;
 
                   return (
-                    <Pressable
+                    <TouchableOpacity
                       key={incident._id ?? idx}
                       className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md"
                       onPress={() =>
@@ -268,7 +267,7 @@ export default function IncidentScreen() {
                           color="rgb(107, 114, 128)"
                         />
                       </View>
-                    </Pressable>
+                    </TouchableOpacity>
                   );
                 })}
 
