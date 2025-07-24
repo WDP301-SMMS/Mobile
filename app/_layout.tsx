@@ -58,7 +58,7 @@ export default function RootLayout() {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="(medication-schedule)"
+                name="(medication-request)"
                 options={{ headerShown: false }}
               />
               <Stack.Screen

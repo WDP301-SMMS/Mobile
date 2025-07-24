@@ -44,6 +44,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedToken = await SecureStore.getItemAsync("authToken");
     // console.log("Stored token:", storedToken);
     if (!storedToken) {
+      setUser(null);
+      setToken(null);
+      setIsLoggedIn(false);
       setLoading(false);
       return;
     }
