@@ -17,6 +17,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const statusMap: Record<string, { label: string; color: string }> = {
+  PENDING: { label: "Chờ chấp thuận", color: "text-orange-500" },
+  APPROVED: { label: "Đồng ý", color: "text-green-600" },
+  DECLINED: { label: "Từ chối", color: "text-red-600" },
+  COMPLETED: { label: "Đã hoàn tất", color: "text-blue-600" },
+  REVOKED: { label: "Đã thu hồi", color: "text-gray-500" },
+  UNDER_OBSERVATION: { label: "Đang theo dõi", color: "text-yellow-600" },
+  ADVERSE_REACTION: { label: "Phản ứng phụ", color: "text-pink-600" },
+};
+
 export default function ConsentDetailScreen() {
   const { id } = useLocalSearchParams();
   const dispatch = useAppDispatch();
@@ -24,76 +34,44 @@ export default function ConsentDetailScreen() {
   const [reason, setReason] = useState("");
 
   useEffect(() => {
-    if (id) {
-      dispatch(getConsentById(id as string));
-    }
+    if (id) dispatch(getConsentById(id as string));
   }, [dispatch, id]);
 
   const consent = consentDetail?.consents.find((c) => c._id === id);
 
-  const handleApprove = async () => {
+  const handleAction = async (status: "APPROVED" | "DECLINED") => {
     if (!consent?.campaignId?._id || !consent?.studentId) {
       Alert.alert("Lỗi", "Thiếu thông tin chiến dịch hoặc học sinh.");
       return;
     }
 
-    Alert.alert(
-      "Xác nhận Đồng ý",
-      "Bạn có chắc chắn muốn đồng ý với phiếu tiêm chủng này?",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Đồng ý",
-          onPress: async () => {
-            try {
-              await dispatch(
-                updateConsentStatus({
-                  campaignId: consent.campaignId._id,
-                  studentId: consent.studentId,
-                  status: "APPROVED",
-                })
-              ).unwrap();
-              router.replace("/(vaccination-consent)");
-            } catch (error) {
-              Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleDecline = () => {
-    if (!consent?.campaignId?._id || !consent?.studentId) {
-      Alert.alert("Lỗi", "Thiếu thông tin chiến dịch hoặc học sinh.");
-      return;
-    }
-
-    if (!reason.trim()) {
+    if (status === "DECLINED" && !reason.trim()) {
       Alert.alert("Lỗi", "Vui lòng nhập lý do từ chối để tiếp tục.");
       return;
     }
 
+    const confirmText = status === "APPROVED" ? "Đồng ý" : "Từ chối";
+
     Alert.alert(
-      "Xác nhận Từ chối",
-      "Bạn có chắc chắn muốn từ chối phiếu tiêm chủng này?",
+      `Xác nhận ${confirmText}`,
+      `Bạn có chắc chắn muốn ${confirmText.toLowerCase()} với phiếu này?`,
       [
         { text: "Hủy", style: "cancel" },
         {
-          text: "Từ chối",
+          text: confirmText,
           onPress: async () => {
             try {
               await dispatch(
                 updateConsentStatus({
                   campaignId: consent.campaignId._id,
                   studentId: consent.studentId,
-                  status: "DECLINED",
-                  reasonForDeclining: reason,
+                  status,
+                  ...(status === "DECLINED" && { reasonForDeclining: reason }),
                 })
               ).unwrap();
               setReason("");
               router.replace("/(vaccination-consent)");
-            } catch (error) {
+            } catch {
               Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
             }
           },
@@ -114,6 +92,23 @@ export default function ConsentDetailScreen() {
       <Text className="text-gray-800 flex-1 text-right ml-4">{value}</Text>
     </View>
   );
+
+  const renderConsentStatus = () => {
+    if (!consent) {
+      return (
+        <Text className="font-semibold text-gray-500">Không có dữ liệu</Text>
+      );
+    }
+
+    const status = statusMap[consent.status] || {
+      label: consent.status,
+      color: "text-gray-500",
+    };
+
+    return (
+      <Text className={`font-semibold ${status.color}`}>{status.label}</Text>
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -183,23 +178,8 @@ export default function ConsentDetailScreen() {
                 <Text className="text-gray-600 font-medium">
                   Trạng thái hiện tại:
                 </Text>
-                <Text
-                  className={`font-semibold ${
-                    consent.status === "APPROVED"
-                      ? "text-green-600"
-                      : consent.status === "DECLINED"
-                      ? "text-red-600"
-                      : "text-orange-500"
-                  }`}
-                >
-                  {consent.status === "APPROVED"
-                    ? "Đồng ý"
-                    : consent.status === "DECLINED"
-                    ? "Từ chối"
-                    : "Chờ chấp thuận"}
-                </Text>
+                {renderConsentStatus()}
               </View>
-
               {consent.reasonForDeclining && (
                 <DetailItem
                   label="Lý do từ chối"
@@ -233,7 +213,7 @@ export default function ConsentDetailScreen() {
                 />
                 <View className="flex-row justify-around gap-x-4 mb-4">
                   <TouchableOpacity
-                    onPress={handleApprove}
+                    onPress={() => handleAction("APPROVED")}
                     className={`flex-1 items-center justify-center py-3 px-6 rounded-lg ${
                       loading ? "bg-primary/50" : "bg-primary"
                     }`}
@@ -248,7 +228,7 @@ export default function ConsentDetailScreen() {
                     )}
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={handleDecline}
+                    onPress={() => handleAction("DECLINED")}
                     className={`flex-1 items-center justify-center py-3 px-6 rounded-lg ${
                       loading ? "bg-red-300" : "bg-red-600"
                     }`}
