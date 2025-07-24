@@ -30,3 +30,8 @@ export interface HealthMeeting {
   notes: string;
   afterMeetingNotes: string;
 }
+
+export interface Respond {
+  action: string;
+  reason?: string;
+}

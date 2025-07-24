@@ -1,6 +1,10 @@
 import { HealthMeeting } from "@/libs/types/appointment";
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllAppointment } from "./thunk";
+import {
+    getAllAppointment,
+    getAppointmentDetail,
+    respondToAppointment,
+} from "./thunk";
 
 type stateType = {
   loading: boolean;
@@ -46,6 +50,25 @@ export const manageAppointmentSlice = createSlice({
         state.hasMore = newData.length > 0;
       })
       .addCase(getAllAppointment.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getAppointmentDetail.pending, (state) => {
+        state.loading = false;
+      })
+      .addCase(getAppointmentDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.appointmentDetail = action.payload?.data;
+      })
+      .addCase(getAppointmentDetail.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(respondToAppointment.pending, (state) => {
+        state.loading = false;
+      })
+      .addCase(respondToAppointment.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(respondToAppointment.rejected, (state) => {
         state.loading = false;
       });
   },

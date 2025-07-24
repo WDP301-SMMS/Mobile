@@ -1,4 +1,5 @@
 import api from "@/libs/hooks/axiosInstance";
+import { Respond } from "../types/appointment";
 
 export const manageAppointment = {
   getAllAppointment: (params?: {
@@ -12,5 +13,7 @@ export const manageAppointment = {
       params: rest,
     });
   },
-  //   getRequestDetail: (req: string) => api.get(`/medication/requests/${req}`),
+  getAppointmentDetail: (req: string) => api.get(`/appointments/${req}`),
+  respondToAppointment: (req: string, body: Respond) =>
+    api.patch(`/appointments/${req}/respond`, body),
 };
