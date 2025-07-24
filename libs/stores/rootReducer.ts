@@ -1,4 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
+import { manageAppointmentReducer } from "./appointmentManager/slice";
 import { manageAuthenReducer } from "./authenManager/slice";
 import { manageConsentReducer } from "./consentManager/slice";
 import { manageHealthCheckReducer } from "./healthCheckManager/slice";
@@ -17,4 +18,5 @@ export const rootReducer = combineReducers({
   manageHealthCheck: manageHealthCheckReducer,
   manageIncident: manageIncidentReducer,
   manageRequest: manageRequestReducer,
+  manageAppointment: manageAppointmentReducer,
 });
