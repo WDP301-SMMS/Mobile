@@ -12,6 +12,5 @@ export const manageIncident = {
       params: rest,
     });
   },
-  //   getHealthProfile: (studentId: string) =>
-  //     api.get(`/health-profiles/student/${studentId}`),
+  getIncidentDetail: (req: string) => api.get(`/incident/${req}`),
 };

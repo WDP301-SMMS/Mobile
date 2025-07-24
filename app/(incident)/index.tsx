@@ -6,6 +6,7 @@ import { resetIncidents } from "@/libs/stores/incidentManager/slice";
 import { getAllIncident } from "@/libs/stores/incidentManager/thunk";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -26,19 +27,26 @@ const severityFilters = [
   { value: "Critical", label: "Nguy kịch" },
 ];
 
+const severityColors: Record<string, string> = {
+  Mild: "text-green-600",
+  Moderate: "text-yellow-600",
+  Severe: "text-orange-600",
+  Critical: "text-red-600",
+};
+
 export default function IncidentScreen() {
   const dispatch = useAppDispatch();
   const { incidents, loading, hasMore, page: currentPage } = useIncident();
   const { myChild } = useHealthProfile();
+  const router = useRouter();
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
   );
   const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
-  const [limit] = useState(10);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [limit] = useState(10);
 
   const fetchData = useCallback(
     (pageToFetch = 1, shouldReset = false) => {
@@ -85,16 +93,12 @@ export default function IncidentScreen() {
 
   const handleSelectStudent = (id: string) => {
     setSelectedStudentId(id);
-    setIsSwitching(true);
     fetchData(1, true);
-    setIsSwitching(false);
   };
 
   const handleSelectSeverity = (value: string | null) => {
     setSelectedSeverity(value);
-    setIsSwitching(true);
     fetchData(1, true);
-    setIsSwitching(false);
   };
 
   const handleLoadMore = () => {
@@ -117,7 +121,7 @@ export default function IncidentScreen() {
   const hasIncidents = Array.isArray(incidents) && incidents.length > 0;
   const selectedStudent = myChild.find((s) => s._id === selectedStudentId);
 
-  if (loading) {
+  if (loading && !hasIncidents) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#2563eb" />
@@ -213,6 +217,7 @@ export default function IncidentScreen() {
         )}
       </View>
 
+      {/* Danh sách sự cố */}
       <ScrollView
         className="flex-1 px-4 py-4"
         contentContainerStyle={{ paddingBottom: 60 }}
@@ -228,31 +233,45 @@ export default function IncidentScreen() {
               Sự cố của {selectedStudent?.fullName ?? "Học sinh không xác định"}
             </Text>
 
-            {loading && !loadingMore ? (
-              <View className="flex items-center justify-center mt-10">
-                <ActivityIndicator size="large" color="#2563EB" />
-              </View>
-            ) : hasIncidents ? (
+            {hasIncidents ? (
               <>
-                {incidents.map((incident, idx) => (
-                  <View
-                    key={incident._id ?? idx}
-                    className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md"
-                  >
-                    <Text className="text-lg font-semibold text-gray-900 mb-1">
-                      {incident.incidentType}
-                    </Text>
-                    <Text className="text-base text-gray-700 mb-2">
-                      {incident.description}
-                    </Text>
-                    <Text className="text-sm text-gray-600 italic">
-                      Mức độ:{" "}
-                      {severityFilters.find(
-                        (s) => s.value === incident.severity
-                      )?.label || incident.severity}
-                    </Text>
-                  </View>
-                ))}
+                {incidents.map((incident, idx) => {
+                  const severityColor =
+                    severityColors[incident.severity] ?? "text-gray-600";
+                  const severityLabel =
+                    severityFilters.find((s) => s.value === incident.severity)
+                      ?.label || incident.severity;
+
+                  return (
+                    <Pressable
+                      key={incident._id ?? idx}
+                      className="mb-4 p-5 bg-white rounded-xl border border-gray-200 shadow-md"
+                      onPress={() =>
+                        router.push(`/(incident)/detail/${incident._id}`)
+                      }
+                    >
+                      <View className="flex-row justify-between items-center">
+                        <View className="flex-1 pr-2">
+                          <Text className="text-lg font-semibold text-gray-900 mb-1">
+                            {incident.incidentType}
+                          </Text>
+                          <Text className="text-base text-gray-700 mb-2">
+                            {incident.description}
+                          </Text>
+                          <Text className={`text-sm italic ${severityColor}`}>
+                            Mức độ: {severityLabel}
+                          </Text>
+                        </View>
+                        <MaterialIcons
+                          name="chevron-right"
+                          size={24}
+                          color="rgb(107, 114, 128)"
+                        />
+                      </View>
+                    </Pressable>
+                  );
+                })}
+
                 {loadingMore && (
                   <View className="items-center justify-center py-4">
                     <ActivityIndicator size="small" color="#2563EB" />

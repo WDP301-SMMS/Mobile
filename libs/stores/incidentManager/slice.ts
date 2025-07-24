@@ -1,10 +1,11 @@
 import { MedicalIncident } from "@/libs/types/incident";
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllIncident } from "./thunk";
+import { getAllIncident, getIncidentDetail } from "./thunk";
 
 type stateType = {
   loading: boolean;
   incidents: MedicalIncident[];
+  incidentDetail: MedicalIncident | null;
   page: number;
   hasMore: boolean;
 };
@@ -12,6 +13,7 @@ type stateType = {
 const initialState: stateType = {
   loading: false,
   incidents: [],
+  incidentDetail: null,
   page: 1,
   hasMore: true,
 };
@@ -44,6 +46,16 @@ export const manageIncidentSlice = createSlice({
         state.hasMore = newData.length > 0;
       })
       .addCase(getAllIncident.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getIncidentDetail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getIncidentDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.incidentDetail = action.payload.data;
+      })
+      .addCase(getIncidentDetail.rejected, (state) => {
         state.loading = false;
       });
   },

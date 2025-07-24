@@ -21,14 +21,14 @@ export const getAllIncident = createAsyncThunk(
   }
 );
 
-// export const studentHealthProfile = createAsyncThunk(
-//   "students/health-profile",
-//   async (req: string, { rejectWithValue }) => {
-//     try {
-//       const response = await manageHealthProfile.getHealthProfile(req);
-//       return response.data;
-//     } catch (error) {
-//       return rejectWithValue("Có lỗi");
-//     }
-//   }
-// );
+export const getIncidentDetail = createAsyncThunk(
+  "incident/detail",
+  async (req: string, { rejectWithValue }) => {
+    try {
+      const response = await manageIncident.getIncidentDetail(req);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Có lỗi");
+    }
+  }
+);

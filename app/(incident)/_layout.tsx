@@ -25,6 +25,18 @@ export default function StackLayout() {
           headerTitleAlign: "center",
         }}
       />
+      <Stack.Screen
+        name="detail/[id]"
+        options={{
+          headerStyle: {
+            backgroundColor: "#2260FF",
+          },
+          headerTintColor: "#fff",
+          headerShown: true,
+          headerTitle: "Chi tiết Sự cố",
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 }
