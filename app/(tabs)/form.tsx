@@ -9,26 +9,26 @@ import {
 } from "react-native";
 
 const sections = [
-  {
-    title: "Thông tin sức khỏe",
-    icon: "medical-information",
-    data: [
-      {
-        icon: "medical-services",
-        label: "Khám sức khỏe",
-        route: "/(health-check)",
-        color: "#10B981",
-        bg: "bg-green-100",
-      },
-      {
-        icon: "vaccines",
-        label: "Tiêm chủng",
-        route: "/(vaccination)",
-        color: "#EF4444",
-        bg: "bg-red-100",
-      },
-    ],
-  },
+  // {
+  //   title: "Thông tin sức khỏe",
+  //   icon: "medical-information",
+  //   data: [
+  //     {
+  //       icon: "medical-services",
+  //       label: "Khám sức khỏe",
+  //       route: "/(health-check)",
+  //       color: "#10B981",
+  //       bg: "bg-green-100",
+  //     },
+  //     {
+  //       icon: "vaccines",
+  //       label: "Tiêm chủng",
+  //       route: "/(vaccination)",
+  //       color: "#EF4444",
+  //       bg: "bg-red-100",
+  //     },
+  //   ],
+  // },
   {
     title: "Lịch trình",
     icon: "event",

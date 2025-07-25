@@ -1,19 +1,19 @@
 import { useAppointment } from "@/libs/hooks/useAppointment";
 import { useAppDispatch } from "@/libs/stores";
 import {
-    getAppointmentDetail,
-    respondToAppointment,
+  getAppointmentDetail,
+  respondToAppointment,
 } from "@/libs/stores/appointmentManager/thunk";
 import { router, useLocalSearchParams } from "expo-router";
 import { ReactNode, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,6 +21,7 @@ const statusMap: Record<string, { label: string; color: string }> = {
   SCHEDULED: { label: "Đã lên lịch", color: "text-yellow-600" },
   COMPLETED: { label: "Đã hoàn tất", color: "text-green-600" },
   CANCELLED: { label: "Đã huỷ", color: "text-red-600" },
+  APPROVED: { label: "Đã xác nhận", color: "text-blue-600" },
 };
 
 const renderGender = (gender: string) => {
@@ -64,7 +65,7 @@ export default function AppointmentDetailScreen() {
 
   const appointment = appointmentDetail;
 
-  const handleAction = (action: "COMPLETED" | "CANCELLED") => {
+  const handleAction = (action: "APPROVED" | "CANCELLED") => {
     if (!appointment?._id) return;
 
     if (action === "CANCELLED" && !reason.trim()) {
@@ -72,7 +73,7 @@ export default function AppointmentDetailScreen() {
       return;
     }
 
-    const confirmText = action === "COMPLETED" ? "Chấp thuận" : "Từ chối";
+    const confirmText = action === "APPROVED" ? "Chấp thuận" : "Từ chối";
 
     Alert.alert(
       `Xác nhận ${confirmText}`,
@@ -231,7 +232,7 @@ export default function AppointmentDetailScreen() {
                 />
                 <View className="flex-row justify-around gap-x-4">
                   <TouchableOpacity
-                    onPress={() => handleAction("COMPLETED")}
+                    onPress={() => handleAction("APPROVED")}
                     className={`flex-1 items-center justify-center py-3 px-6 rounded-lg ${
                       loading ? "bg-primary/50" : "bg-primary"
                     }`}
