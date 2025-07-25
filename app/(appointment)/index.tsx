@@ -24,6 +24,7 @@ import {
 const statusFilters = [
   { value: null, label: "Tất cả" },
   { value: "SCHEDULED", label: "Đã lên lịch" },
+  { value: "APPROVED", label: "Đã xác nhận" },
   { value: "COMPLETED", label: "Đã hoàn thành" },
   { value: "CANCELLED", label: "Đã hủy" },
 ];
@@ -31,6 +32,7 @@ const statusFilters = [
 // Gán màu cho mỗi trạng thái
 const statusColors: Record<string, string> = {
   SCHEDULED: "text-blue-600",
+  APPROVED: "text-purple-600",
   COMPLETED: "text-green-600",
   CANCELLED: "text-red-600",
 };
