@@ -27,7 +27,7 @@ const getStatusColor = (status: string) => {
       return "text-yellow-600";
     case "Scheduled":
       return "text-blue-600";
-    case "In_progress":
+    case "In progress":
       return "text-purple-600";
     case "Completed":
       return "text-green-600";
@@ -42,7 +42,7 @@ const statusFilters = [
   { value: null, label: "Tất cả" },
   { value: "Pending", label: "Chờ xác nhận" },
   { value: "Scheduled", label: "Đã lên lịch" },
-  { value: "In_progress", label: "Đang thực hiện" },
+  { value: "In progress", label: "Đang thực hiện" },
   { value: "Completed", label: "Hoàn tất" },
   { value: "Cancelled", label: "Đã hủy" },
 ];

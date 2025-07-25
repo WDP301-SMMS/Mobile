@@ -2,18 +2,18 @@ import { MedicationCalendar } from "@/components/schedule/MedicationCalendar";
 import { useRequest } from "@/libs/hooks/useRequest";
 import { useAppDispatch } from "@/libs/stores";
 import {
-    getRequestDetail,
-    getRequestSchedule,
+  getRequestDetail,
+  getRequestSchedule,
 } from "@/libs/stores/requestManager/thunk";
 import * as Linking from "expo-linking";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,7 +23,7 @@ export const requestStatusMap: Record<
 > = {
   Pending: { label: "Chờ duyệt", color: "text-yellow-500" },
   Scheduled: { label: "Đã lên lịch", color: "text-blue-500" },
-  In_progress: { label: "Đang thực hiện", color: "text-indigo-600" },
+  "In progress": { label: "Đang thực hiện", color: "text-indigo-600" },
   Completed: { label: "Hoàn thành", color: "text-green-600" },
   Cancelled: { label: "Đã huỷ", color: "text-gray-500" },
 };
