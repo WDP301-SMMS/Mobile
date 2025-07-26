@@ -156,7 +156,7 @@ export default function SignInScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-white border border-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80 flex-row justify-center items-center">
+          {/* <TouchableOpacity className="bg-white border border-primary py-3 rounded-full w-full mb-4 shadow-md active:opacity-80 flex-row justify-center items-center">
             <Image
               source={require("@/assets/icons/google.png")}
               style={{ width: 20, height: 20, marginRight: 8 }}
@@ -164,7 +164,7 @@ export default function SignInScreen() {
             <Text className="text-primary text-center font-semibold text-lg">
               Đăng nhập bằng google
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View className="flex-row justify-center">
             <Text className="text-gray-600">Chưa có tài khoản? </Text>
