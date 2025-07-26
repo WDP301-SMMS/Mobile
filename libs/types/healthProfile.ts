@@ -84,3 +84,45 @@ export interface HealthProfile {
   vaccines: InjectedVaccine[];
   studentInfo: Student;
 }
+
+interface HealthCheckDetail {
+  itemName: string;
+  value: number;
+  unit: string;
+  isAbnormal: boolean;
+}
+
+interface Observations {
+  observedAt: string;
+  notes: string;
+  isAbnormal: boolean;
+}
+
+interface HealthCheckHistory {
+  campaignName: string;
+  className: string;
+  checkupDate: string;
+  overallConclusion: string;
+  recommendations: string;
+  nurseName: string;
+  details: HealthCheckDetail[];
+}
+
+interface VaccinationHistory {
+  campaignName: string;
+  vaccineName: string;
+  doseNumber: number;
+  administeredAt: string;
+  administeredBy: string;
+  organizationName: string;
+  observations: Observations[];
+}
+
+export interface HealthHistory {
+  studentId: string;
+  studentName: string;
+  currentClassName: string;
+  schoolYear: string;
+  healthChecks: HealthCheckHistory[];
+  vaccinations: VaccinationHistory[];
+}
