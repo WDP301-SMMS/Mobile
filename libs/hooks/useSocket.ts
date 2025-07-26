@@ -5,7 +5,7 @@ export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketIo = io("https://b83d017c3f1f.ngrok-free.app", {
+    const socketIo = io(`${process.env.EXPO_PUBLIC_BASE_URL}`, {
       transports: ["websocket"],
       withCredentials: true,
     });
