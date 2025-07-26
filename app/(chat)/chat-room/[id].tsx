@@ -15,6 +15,7 @@ import { Message } from "@/libs/types/message";
 import { formatDateHeader } from "@/libs/utils/formatDateHeader";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import debounce from "lodash.debounce";
 import {
   useCallback,
   useEffect,
@@ -28,6 +29,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -43,6 +45,7 @@ export default function ChatDetailScreen() {
   const dispatch = useAppDispatch();
   const scrollViewRef = useRef<ScrollView>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   const receiverUser = useMemo(() => {
     if (message.length === 0 || !user) return undefined;
@@ -75,11 +78,24 @@ export default function ChatDetailScreen() {
       dispatch(addMessageToLocal(msg));
     };
 
+    const handleTyping = ({ senderId }: { senderId: string }) => {
+      if (senderId !== user?._id) setIsTyping(true);
+    };
+
+    const handleStopTyping = ({ senderId }: { senderId: string }) => {
+      if (senderId !== user?._id) setIsTyping(false);
+    };
+
     socket.on("receiveMessage", handleReceiveMessage);
+    socket.on("typing", handleTyping);
+    socket.on("stopTyping", handleStopTyping);
+
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
+      socket.off("typing", handleTyping);
+      socket.off("stopTyping", handleStopTyping);
     };
-  }, [socket, dispatch]);
+  }, [socket, dispatch, user?._id]);
 
   useEffect(() => {
     if (!socket || !user || !receiverUser || !roomId) return () => {};
@@ -108,6 +124,24 @@ export default function ChatDetailScreen() {
     },
     [socket, user, receiverUser, roomId]
   );
+
+  const debouncedStopTyping = useMemo(
+    () =>
+      debounce(() => {
+        if (socket && roomId && user) {
+          socket.emit("stopTyping", { roomId, senderId: user._id });
+        }
+      }, 1000),
+    [socket, roomId, user]
+  );
+
+  const handleTextChange = (text: string) => {
+    setNewMessage(text);
+    if (socket && roomId && user) {
+      socket.emit("typing", { roomId, senderId: user._id });
+      debouncedStopTyping();
+    }
+  };
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -195,7 +229,6 @@ export default function ChatDetailScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-white"
     >
-
       <ScrollView
         ref={scrollViewRef}
         className="flex-1 p-4"
@@ -214,6 +247,10 @@ export default function ChatDetailScreen() {
         ))}
       </ScrollView>
 
+      <View className="h-6 px-4">
+        {isTyping && <Text className="text-gray-500 italic">Đang soạn...</Text>}
+      </View>
+
       <View className="flex-row items-center p-4 border-t border-gray-200 bg-white">
         <TouchableOpacity onPress={handlePickImage} className="p-2 mr-2">
           <Entypo name="image" size={24} color="#2260FF" />
@@ -223,7 +260,7 @@ export default function ChatDetailScreen() {
           className="flex-1 p-3 border border-gray-300 rounded-2xl mr-3 text-base"
           placeholder="Nhập tin nhắn..."
           value={newMessage}
-          onChangeText={setNewMessage}
+          onChangeText={handleTextChange} 
           multiline
           returnKeyType="send"
           onSubmitEditing={handleSendMessage}
