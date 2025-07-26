@@ -1,17 +1,28 @@
-import { HealthProfile, Student } from "@/libs/types/healthProfile";
+import {
+  HealthHistory,
+  HealthProfile,
+  Student,
+} from "@/libs/types/healthProfile";
 import { createSlice } from "@reduxjs/toolkit";
-import { claimStudent, getMyChild, studentHealthProfile } from "./thunk";
+import {
+  claimStudent,
+  getMyChild,
+  studentHealthHistory,
+  studentHealthProfile,
+} from "./thunk";
 
 type stateType = {
   loading: boolean;
   myChild: Student[] | [];
   healthProfile: HealthProfile | null;
+  healthHistory: HealthHistory | null;
 };
 
 const initialState: stateType = {
   loading: false,
   myChild: [],
   healthProfile: null,
+  healthHistory: null,
 };
 
 export const manageHealthProfileSlice = createSlice({
@@ -47,6 +58,16 @@ export const manageHealthProfileSlice = createSlice({
         state.healthProfile = action.payload.data;
       })
       .addCase(studentHealthProfile.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(studentHealthHistory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(studentHealthHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.healthHistory = action.payload.data;
+      })
+      .addCase(studentHealthHistory.rejected, (state) => {
         state.loading = false;
       });
   },

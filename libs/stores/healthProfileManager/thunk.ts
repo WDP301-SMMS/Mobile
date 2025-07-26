@@ -36,3 +36,21 @@ export const studentHealthProfile = createAsyncThunk(
     }
   }
 );
+
+export const studentHealthHistory = createAsyncThunk(
+  "students/health-history",
+  async (
+    { studentId, schoolYear }: { studentId: string; schoolYear: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await manageHealthProfile.getHealthHistory(
+        studentId,
+        schoolYear
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Có lỗi");
+    }
+  }
+);

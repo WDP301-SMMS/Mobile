@@ -8,4 +8,6 @@ export const manageHealthProfile = {
     }),
   getHealthProfile: (studentId: string) =>
     api.get(`/health-profiles/student/${studentId}`),
+  getHealthHistory: (studentId: string, schoolYear: string) =>
+    api.get(`/health-history/students/${studentId}?schoolYear=${schoolYear}`),
 };
