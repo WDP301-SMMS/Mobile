@@ -14,10 +14,10 @@ export const ChatMessageGroup = ({ messages, isSender, header }: Props) => {
   if (messages.length === 0) return null;
 
   const shouldShowTime = (index: number) => {
-    if (index === messages.length - 1) return true;
+    if (index === 0) return true;
     const current = new Date(messages[index].createdAt).getTime();
-    const next = new Date(messages[index + 1].createdAt).getTime();
-    return next - current >= TIME_GAP;
+    const prev = new Date(messages[index - 1].createdAt).getTime();
+    return current - prev >= TIME_GAP;
   };
 
   const shouldShowName = (index: number) => {
@@ -39,7 +39,9 @@ export const ChatMessageGroup = ({ messages, isSender, header }: Props) => {
 
   return (
     <View className="mb-6">
-      <Text className="text-center text-gray-500 text-sm mb-2">{header}</Text>
+      {header ? (
+        <Text className="text-center text-gray-500 text-sm mb-2">{header}</Text>
+      ) : null}
 
       {messages.map((msg, index) => {
         const isMine = isSender(msg.senderId._id);

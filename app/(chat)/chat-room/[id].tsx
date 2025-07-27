@@ -187,7 +187,6 @@ export default function ChatDetailScreen() {
     let lastSender = "";
     let lastTimestamp = 0;
     let lastHeader = "";
-    let shownHeader = false;
 
     const TIME_GAP = 30 * 60 * 1000;
 
@@ -201,10 +200,9 @@ export default function ChatDetailScreen() {
 
       if (shouldStartNewGroup && currentGroup.length > 0) {
         grouped.push({
-          header: shownHeader ? "" : lastHeader,
+          header: lastHeader, // luôn truyền header ngày
           messages: currentGroup,
         });
-        shownHeader = true;
         currentGroup = [];
       }
 
@@ -216,13 +214,17 @@ export default function ChatDetailScreen() {
 
     if (currentGroup.length > 0) {
       grouped.push({
-        header: shownHeader ? "" : lastHeader,
+        header: lastHeader,
         messages: currentGroup,
       });
     }
 
     return grouped;
   };
+
+  const sortedMessages = [...message].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
 
   return (
     <KeyboardAvoidingView
@@ -237,7 +239,7 @@ export default function ChatDetailScreen() {
           scrollViewRef.current?.scrollToEnd({ animated: true })
         }
       >
-        {groupMessages(message).map((group, index) => (
+        {groupMessages(sortedMessages).map((group, index) => (
           <ChatMessageGroup
             key={index}
             messages={group.messages}

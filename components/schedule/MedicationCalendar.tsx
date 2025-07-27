@@ -88,7 +88,10 @@ export const MedicationCalendar = ({ schedules }: Props) => {
               style={{ marginRight: 6 }}
             />
             <Text className="text-lg font-bold text-gray-800">
-              Chi tiết {new Date(selectedDate).toLocaleDateString("vi-VN")}
+              Chi tiết {(() => {
+                const [y, m, d] = selectedDate.split("-").map(Number);
+                return new Date(y, m - 1, d).toLocaleDateString("vi-VN");
+              })()}
             </Text>
           </View>
 
