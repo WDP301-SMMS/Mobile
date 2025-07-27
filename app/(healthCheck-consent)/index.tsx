@@ -25,7 +25,7 @@ const statusFilters = [
   { value: "OVERDUE", label: "Quá hạn" },
   { value: "NO_RESPONSE", label: "Không phản hồi" },
   { value: "REVOKED", label: "Đã thu hồi" },
-  { value: "UNDER_OBSERVATION", label: "Đang theo dõi" },
+  { value: "UNDER_OPSERVATION", label: "Đang theo dõi" },
   { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
 ];
 
@@ -81,7 +81,7 @@ const statusMap: Record<
     bgColor: "bg-gray-100",
     iconColor: "rgb(75, 85, 99)",
   },
-  UNDER_OBSERVATION: {
+  UNDER_OPSERVATION: {
     label: "Đang theo dõi",
     icon: "visibility",
     textColor: "text-yellow-700",

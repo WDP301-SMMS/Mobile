@@ -187,7 +187,7 @@ export default function ConsentDetailScreen() {
                     OVERDUE: "Quá hạn",
                     NO_RESPONSE: "Không phản hồi",
                     REVOKED: "Đã thu hồi",
-                    UNDER_OBSERVATION: "Đang theo dõi",
+                    UNDER_OPSERVATION: "Đang theo dõi",
                     ADVERSE_REACTION: "Phản ứng phụ",
                   }[consent.status] || "Không xác định"
                 }
