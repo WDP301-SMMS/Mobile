@@ -52,7 +52,7 @@ export default function ConsentDetailScreen() {
                 },
               })
             ).unwrap();
-            router.replace("/(healthCheck-consent)");
+            router.back();
           } catch {
             Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
           }
@@ -88,7 +88,7 @@ export default function ConsentDetailScreen() {
               })
             ).unwrap();
             setReason("");
-            router.replace("/(healthCheck-consent)");
+            router.back();
           } catch {
             Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
           }

@@ -72,7 +72,7 @@ export default function ConsentDetailScreen() {
                 })
               ).unwrap();
               setReason("");
-              router.replace("/(vaccination-consent)");
+              router.back();
             } catch {
               Alert.alert("Lỗi", "Không thể cập nhật trạng thái.");
             }

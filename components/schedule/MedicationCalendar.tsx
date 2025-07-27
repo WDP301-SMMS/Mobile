@@ -47,13 +47,8 @@ export const MedicationCalendar = ({ schedules }: Props) => {
       };
     }
 
-    // Avoid duplicate dots for same color
-    const hasSameColor = acc[date].dots.some(
-      (dot: any) => dot.color === dotColor
-    );
-    if (!hasSameColor) {
-      acc[date].dots.push({ color: dotColor });
-    }
+    // Luôn thêm dot cho mỗi buổi, kể cả trùng màu
+    acc[date].dots.push({ color: dotColor });
 
     return acc;
   }, {} as Record<string, any>);
