@@ -179,15 +179,17 @@ export default function ConsentDetailScreen() {
               <DetailItem
                 label="Trạng thái"
                 value={
-                  consent.status === "APPROVED"
-                    ? "Đồng ý"
-                    : consent.status === "DECLINED"
-                    ? "Từ chối"
-                    : consent.status === "COMPLETED"
-                    ? "Đã hoàn tất"
-                    : consent.status === "REVOKED"
-                    ? "Đã thu hồi"
-                    : "Chờ chấp thuận"
+                  {
+                    PENDING: "Chờ chấp thuận",
+                    APPROVED: "Đồng ý",
+                    DECLINED: "Từ chối",
+                    COMPLETED: "Đã hoàn tất",
+                    OVERDUE: "Quá hạn",
+                    NO_RESPONSE: "Không phản hồi",
+                    REVOKED: "Đã thu hồi",
+                    UNDER_OBSERVATION: "Đang theo dõi",
+                    ADVERSE_REACTION: "Phản ứng phụ",
+                  }[consent.status] || "Không xác định"
                 }
               />
               {consent.reasonForDeclining && (

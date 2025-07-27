@@ -22,6 +22,8 @@ const statusMap: Record<string, { label: string; color: string }> = {
   APPROVED: { label: "Đồng ý", color: "text-green-600" },
   DECLINED: { label: "Từ chối", color: "text-red-600" },
   COMPLETED: { label: "Đã hoàn tất", color: "text-blue-600" },
+  OVERDUE: { label: "Quá hạn", color: "text-red-500" },
+  NO_RESPONSE: { label: "Không phản hồi", color: "text-gray-400" },
   REVOKED: { label: "Đã thu hồi", color: "text-gray-500" },
   UNDER_OBSERVATION: { label: "Đang theo dõi", color: "text-yellow-600" },
   ADVERSE_REACTION: { label: "Phản ứng phụ", color: "text-pink-600" },

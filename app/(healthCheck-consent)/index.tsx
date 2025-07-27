@@ -11,7 +11,9 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  Text, TouchableOpacity, View
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const statusFilters = [
@@ -20,6 +22,8 @@ const statusFilters = [
   { value: "APPROVED", label: "Đồng ý" },
   { value: "DECLINED", label: "Từ chối" },
   { value: "COMPLETED", label: "Đã hoàn tất" },
+  { value: "OVERDUE", label: "Quá hạn" },
+  { value: "NO_RESPONSE", label: "Không phản hồi" },
   { value: "REVOKED", label: "Đã thu hồi" },
   { value: "UNDER_OBSERVATION", label: "Đang theo dõi" },
   { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
@@ -55,6 +59,20 @@ const statusMap: Record<
     textColor: "text-blue-800",
     bgColor: "bg-blue-100",
     iconColor: "rgb(30, 64, 175)",
+  },
+  OVERDUE: {
+    label: "Quá hạn",
+    icon: "schedule",
+    textColor: "text-red-600",
+    bgColor: "bg-red-100",
+    iconColor: "rgb(220, 38, 38)",
+  },
+  NO_RESPONSE: {
+    label: "Không phản hồi",
+    icon: "help-outline",
+    textColor: "text-gray-500",
+    bgColor: "bg-gray-100",
+    iconColor: "rgb(107, 114, 128)",
   },
   REVOKED: {
     label: "Đã thu hồi",
