@@ -26,7 +26,7 @@ const statusFilters = [
   { value: "OVERDUE", label: "Quá hạn" },
   { value: "NO_RESPONSE", label: "Không phản hồi" },
   { value: "REVOKED", label: "Đã thu hồi" },
-  { value: "UNDER_OBSERVATION", label: "Đang theo dõi" },
+  { value: "UNDER_OPSERVATION", label: "Đang theo dõi" },
   { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
 ];
 
@@ -118,7 +118,7 @@ export default function ConsentScreen() {
           iconName: "block",
           label: "Đã thu hồi",
         };
-      case "UNDER_OBSERVATION":
+      case "UNDER_OPSERVATION":
         return {
           textColorClass: "text-yellow-700",
           bgColorClass: "bg-yellow-100",
