@@ -88,7 +88,7 @@ export default function ChildDetailScreen() {
         <View className="flex-row items-center mb-4">
           <MaterialIcons name="health-and-safety" size={24} color="#22C55E" />
           <Text className="text-xl font-bold text-primary ml-3">
-            Bệnh mạn tính
+            Bệnh mãn tính
           </Text>
         </View>
         {healthProfile.chronicConditions.length > 0 ? (
@@ -141,8 +141,7 @@ export default function ChildDetailScreen() {
         )}
       </View>
 
-      {/* --- Khám mắt --- */}
-      <View className="px-6 py-6 border-b border-gray-100">
+      {/* <View className="px-6 py-6 border-b border-gray-100">
         <View className="flex-row items-center mb-4">
           <MaterialIcons name="visibility" size={24} color="#A855F7" />
           <Text className="text-xl font-bold text-primary ml-3">Khám mắt</Text>
@@ -172,7 +171,6 @@ export default function ChildDetailScreen() {
         )}
       </View>
 
-      {/* --- Khám tai --- */}
       <View className="px-6 py-6 border-b border-gray-100">
         <View className="flex-row items-center mb-4">
           <MaterialIcons name="hearing" size={24} color="#F59E0B" />
@@ -200,7 +198,6 @@ export default function ChildDetailScreen() {
         )}
       </View>
 
-      {/* --- Lịch sử tiêm chủng --- */}
       <View className="px-6 py-6 pb-20">
         <View className="flex-row items-center mb-4">
           <MaterialIcons name="vaccines" size={24} color="#0EA5E9" />
@@ -225,7 +222,8 @@ export default function ChildDetailScreen() {
         ) : (
           <Text className="text-gray-600">Không có lịch sử tiêm chủng.</Text>
         )}
-      </View>
+      </View> */}
+      
       <View className="px-6 mb-10">
         <Text className="text-center text-sm text-gray-500 italic">
           Để chỉnh sửa hồ sơ, vui lòng truy cập website
