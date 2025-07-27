@@ -135,6 +135,10 @@ export default function AppointmentDetailScreen() {
     );
   };
 
+  const isExpired =
+    appointment?.meetingTime &&
+    new Date(appointment.meetingTime).getTime() < new Date().getTime();
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1 px-5">
@@ -215,7 +219,7 @@ export default function AppointmentDetailScreen() {
               />
             </View>
 
-            {appointment.status === "SCHEDULED" && (
+            {appointment.status === "SCHEDULED" && !isExpired && (
               <View className="bg-white rounded-xl p-5 shadow mb-10">
                 <Text className="text-xl font-bold text-gray-800 mb-4">
                   Hành động
@@ -263,6 +267,15 @@ export default function AppointmentDetailScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
+              </View>
+            )}
+
+            {appointment.status === "SCHEDULED" && isExpired && (
+              <View className="bg-white rounded-xl p-5 shadow mb-10">
+                <Text className="text-red-600 font-semibold text-center text-base">
+                  Cuộc hẹn đã quá thời gian, bạn không thể chấp thuận hoặc từ
+                  chối nữa.
+                </Text>
               </View>
             )}
           </>
