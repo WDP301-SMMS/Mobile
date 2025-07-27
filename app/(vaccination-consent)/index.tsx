@@ -23,6 +23,8 @@ const statusFilters = [
   { value: "APPROVED", label: "Đồng ý" },
   { value: "DECLINED", label: "Từ chối" },
   { value: "COMPLETED", label: "Đã hoàn tất" },
+  { value: "OVERDUE", label: "Quá hạn" },
+  { value: "NO_RESPONSE", label: "Không phản hồi" },
   { value: "REVOKED", label: "Đã thu hồi" },
   { value: "UNDER_OBSERVATION", label: "Đang theo dõi" },
   { value: "ADVERSE_REACTION", label: "Phản ứng phụ" },
@@ -91,6 +93,22 @@ export default function ConsentScreen() {
           iconColorHex: "rgb(30, 64, 175)",
           iconName: "task-alt",
           label: "Đã hoàn tất",
+        };
+      case "OVERDUE":
+        return {
+          textColorClass: "text-red-600",
+          bgColorClass: "bg-red-100",
+          iconColorHex: "rgb(220, 38, 38)",
+          iconName: "schedule",
+          label: "Quá hạn",
+        };
+      case "NO_RESPONSE":
+        return {
+          textColorClass: "text-gray-500",
+          bgColorClass: "bg-gray-100",
+          iconColorHex: "rgb(107, 114, 128)",
+          iconName: "help-outline",
+          label: "Không phản hồi",
         };
       case "REVOKED":
         return {
